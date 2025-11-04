@@ -1,0 +1,88 @@
+{% extends "app/base.html" %}
+
+{% load static %}
+
+{% block title %}Dashboard{% endblock %}
+
+{% block content %}
+<div x-data="dashboardApp()" x-init="init()">
+	<button @click="showModal = true" style="outline">Add Transaction</button>
+
+	<!-- Modal -->
+	<dialog open x-show="showModal" x-transition
+		class=""
+		@click.self="showModal = false"
+	>
+		<article class="modal-content">
+			<h3>New Transaction</h3>
+			<form @submit.prevent="addTransaction" style="margin-bottom: 0;">
+				<label>
+					Description
+					<input type="text" x-model="newDescription" required>
+				</label>
+
+				<label>
+					Amount
+					<input type="number" x-model="newAmount" step="0.01" required>
+				</label>
+
+				<fieldset>
+					<legend>Type</legend>
+
+					<label>
+						<input type="radio" name="type" x-model="newIsIncome" :value="true">
+						Income
+					</label>
+
+					<label>
+						<input type="radio" name="type" x-model="newIsIncome" :value="false">
+						Expense
+					</label>
+				</fieldset>
+
+				<footer class="modal-actions">
+					<button type="button" class="secondary" @click="showModal = false" style="min-width: 25%;">Cancel</button>
+					<button type="submit" style="max-width: 25%;">Save</button>
+				</footer>
+			</form>
+		</article>
+	</dialog>
+
+	<!-- Transactions Table -->
+	<table>
+		<thead>
+			<tr>
+				<th>Date</th>
+				<th>Description</th>
+				<th>Type</th>
+				<th>Amount</th>
+			</tr>
+		</thead>
+		<tbody>
+			<template x-for="t in transactions" :key="t.id">
+				<tr>
+					<td x-text="new Date(t.date).toLocaleDateString()"></td>
+					<td x-text="t.description"></td>
+					<td x-text="t.is_income ? 'Income' : 'Expense'"></td>
+					<td x-text="t.amount"></td>
+				</tr>
+			</template>
+		</tbody>
+	</table>
+
+	<!-- Chart -->
+	<article style="max-width: 300px; margin: 2rem auto;">
+		<canvas id="summaryChart"></canvas>
+	</article>
+
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+	window.csrf_token = "{{ csrf_token }}";
+	window.initialTransactions = {{ transactions_json|safe }};
+	window.transactionsApiUrl = "{% url 'transaction-list' %}";
+</script>
+<script src="{% static 'app/js/dashboard.js' %}"></script>
+{% endblock %}

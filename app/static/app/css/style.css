@@ -1,0 +1,22 @@
+.modal-content {
+	max-width: 600px;
+}
+
+.modal-actions {
+	display: flex;
+	justify-content: flex-end;
+	gap: 0.5rem;
+	margin-top: 2rem;
+}
+
+fieldset legend {
+	font-weight: 600;
+	margin-bottom: 0.5rem;
+}
+
+fieldset label {
+	margin-right: 1rem;
+	display: inline-flex;
+	align-items: center;
+	gap: 0.3rem;
+}
