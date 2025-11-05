@@ -67,7 +67,7 @@
 	</table>
 
 	<!-- Table Pagination -->
-	<div class="table-pagination">
+	<div class="table-pagination" x-show="totalPages > 1">
 		<!-- Previous -->
 		<button class="outline" @click="goPrevPage" :disabled="currentPage === 1">&lt;</button>
 

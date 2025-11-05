@@ -21,11 +21,6 @@ function dashboardApp() {
         categoryType: 'expense',
 
         init() {
-            console.log("Total pages:", this.totalPages);
-            this.$watch('currentPage', () => {
-                console.log("Visible pages:", this.visiblePages);
-            });
-
             this.updateCategoriesForType(this.isIncome ? 'income' : 'expense');
 
             // initialize chart
