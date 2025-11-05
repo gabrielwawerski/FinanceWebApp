@@ -16,6 +16,7 @@
 	{% block extra_head %}{% endblock %}
 </head>
 <body>
+
 <header>
   <nav class="container" aria-label="Main navigation">
     <!-- Left links -->
@@ -51,6 +52,28 @@
 	<footer class="container">
 		<p>&copy; 2025 Finance App</p>
 	</footer>
+<script>
+	document.addEventListener('alpine:init', () => {
+    Alpine.store('app', {
+        transactions: window.initialTransactions || [],
+        categories: window.initialCategories || [],
+        currency: 'PLN',
+
+        addTransaction(transaction) {
+            this.transactions.unshift(transaction)
+        },
+
+        addCategory(category) {
+            this.categories.push(category)
+        },
+
+        // helper for filtered categories by type
+        filteredCategories(type) {
+            return this.categories.filter(c => c.type === type)
+        }
+    })
+})
+</script>
 	{% block extra_js %}
 	{% endblock %}
 </body>

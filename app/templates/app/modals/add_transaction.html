@@ -1,0 +1,71 @@
+<dialog x-show="showTransactionModal"
+        x-transition
+        :open="showTransactionModal"
+        @click.self="if (!isSubmitting) showTransactionModal = false"
+        @keydown.escape.window="if (!isSubmitting) showTransactionModal = false"
+        class="modal"
+>
+	<article class="modal-content">
+		<h3 style="padding: 0.5rem 0 0.5rem 0;">New Transaction</h3>
+		<form @submit.prevent="addTransaction" style="margin-bottom: 0;">
+			<label>
+				Amount
+				<input type="number" x-model="transactionAmount" step="0.01" required>
+			</label>
+
+			<label>
+				Description
+				<input type="text" x-model="transactionDescription" required>
+			</label>
+
+			<fieldset>
+				<legend>Type</legend>
+				<label>
+					<input type="radio" name="type" x-model="isIncome" :value="true"
+					       @change="updateCategoriesForType('income')">
+					Income
+				</label>
+				<label>
+					<input type="radio" name="type" x-model="isIncome" :value="false"
+					       @change="updateCategoriesForType('expense')">
+					Expense
+				</label>
+			</fieldset>
+
+			<label>
+				Category
+				<div class="grid" style="grid-template-columns: 1fr auto; gap: .5rem;">
+					<select x-model="selectedCategoryId">
+						<template x-for="c in filteredCategories" :key="c.id">
+							<option :value="c.id" :style="`color: ${c.color}`" x-text="c.name"></option>
+						</template>
+					</select>
+					<button type="button"
+					        class="secondary"
+					        @click="showCategoryModal = true">
+						New
+					</button>
+				</div>
+			</label>
+
+
+			<footer class="modal-actions">
+				<button type="submit"
+				        :aria-busy="isSubmitting"
+				        :disabled="isSubmitting"
+				        style="max-width: 25%;">
+					<span x-show="!isSubmitting">Save</span>
+					<span x-show="isSubmitting"></span>
+				</button>
+
+				<button type="button"
+				        class="secondary"
+				        @click="if (!isSubmitting) showModal = false"
+				        :disabled="isSubmitting"
+				        style="min-width: 25%;">
+					Cancel
+				</button>
+			</footer>
+		</form>
+	</article>
+</dialog>

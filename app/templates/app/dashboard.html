@@ -5,77 +5,14 @@
 {% block title %}Dashboard{% endblock %}
 
 {% block content %}
-<div x-data="dashboardApp()" x-init="init()">
+<div x-data="dashboardApp" x-init="init()">
 	<!-- Modal -->
-	<dialog x-show="showModal"
-	        x-transition
-	        :open="showModal"
-			@click.self="if (!isSubmitting) showModal = false"
-	        @keydown.escape.window="if (!isSubmitting) showModal = false"
-            class="modal"
-	>
-		<article class="modal-content">
-			<h3 style="padding: 0.5rem 0 0.5rem 0;">New Transaction</h3>
-			<form @submit.prevent="addTransaction" style="margin-bottom: 0;">
-				<label>
-					Amount
-					<input type="number" x-model="newAmount" step="0.01" required>
-				</label>
-
-				<label>
-					Description
-					<input type="text" x-model="newDescription" required>
-				</label>
-
-<fieldset>
-    <legend>Type</legend>
-    <label>
-        <input type="radio" name="type" x-model="newIsIncome" :value="true"
-               @change="updateCategoriesForType('income')">
-        Income
-    </label>
-    <label>
-        <input type="radio" name="type" x-model="newIsIncome" :value="false"
-               @change="updateCategoriesForType('expense')">
-        Expense
-    </label>
-</fieldset>
-
-<label>
-    Category
-    <select x-model="newCategory">
-        <template x-for="c in filteredCategories" :key="c.id">
-            <option :value="c.id" :style="`color: ${c.color}`"
-                    x-text="c.name"></option>
-        </template>
-    </select>
-</label>
-
-
-				<footer class="modal-actions">
-					<button type="submit"
-					        :aria-busy="isSubmitting"
-					        :disabled="isSubmitting"
-					        style="max-width: 25%;">
-					    <span x-show="!isSubmitting">Save</span>
-					    <span x-show="isSubmitting"></span>
-					</button>
-
-					<button type="button"
-					        class="secondary"
-					        @click="if (!isSubmitting) showModal = false"
-					        :disabled="isSubmitting"
-					        style="min-width: 25%;">
-						Cancel
-					</button>
-				</footer>
-			</form>
-		</article>
-	</dialog>
+	{% include "app/modals/add_transaction.html" %}
+	{% include "app/modals/add_category.html" %}
 
 	<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
         <!-- Add Transaction Button -->
-        <button @click="showModal = true">Add Transaction</button>
+        <button @click="showTransactionModal = true">Add Transaction</button>
 
         <!-- Current Balance on the right -->
 		<div style="display:flex; flex-direction: column; align-items: flex-end;">
@@ -84,7 +21,7 @@
 			</div>
 			<div style="font-weight: bold; font-size: 1.2rem;"
 			     :style="`color: ${balance < 0 ? '#e74c3c' : '#2ecc71'}`">
-			    $<span x-text="balance.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2}) + '&nbsp;&nbsp;PLN'"></span>
+			    <span x-text="balance.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2}) + '&nbsp;&nbsp;PLN'"></span>
 			</div>
 		</div>
 
@@ -114,9 +51,9 @@
 					    return `${day}/${month}/${year}&nbsp;&nbsp;&nbsp;${hours}:${minutes}`;
 					})()"></td>
 		            <td x-text="t.description"></td>
-			        <td>
+			        <td style="text-align: end;">
 					<span
-						:style="`color: ${t.category?.color || '#888'}`"
+						:style="`color: ${t.category?.color || '#888'};`"
 						x-text="t.category?.name || 'Uncategorized'">
 					</span>
 				</td>
@@ -154,11 +91,6 @@
 	<!-- Next -->
 	<button class="outline" @click="goNextPage" :disabled="currentPage === totalPages">&gt;</button>
 </div>
-
-
-
-
-
 
 	<!-- Chart -->
 	<article style="max-width: 300px; margin: 2rem auto;">

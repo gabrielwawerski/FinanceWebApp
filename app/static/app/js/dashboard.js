@@ -1,33 +1,32 @@
 function dashboardApp() {
     return {
-        // Transactions
-        transactions: window.initialTransactions || [],
-        newDescription: '',
-        newAmount: '',
-        newIsIncome: false,
-        newCategory: null,
-        showModal: false,
+        transactionDescription: '',
+        transactionAmount: '',
+        isIncome: false,
+        selectedCategoryId: null,
+
+        showTransactionModal: false,
+        showCategoryModal: false,
+
         isSubmitting: false,
         chartInstance: null,
 
         // Pagination
         currentPage: 1,
-        pageSize: 2,
+        pageSize: 10,
 
-        // Categories
-        categories: window.initialCategories || [], // all categories
         filteredCategories: [], // reactive filtered list
-        newCategoryName: '',
-        newCategoryColor: '#2ecc71', // default color
+        categoryName: '',
+        categoryColor: '#888888',
+        categoryType: 'expense',
 
         init() {
             console.log("Total pages:", this.totalPages);
-	this.$watch('currentPage', () => {
-		console.log("Visible pages:", this.visiblePages);
-	});
+            this.$watch('currentPage', () => {
+                console.log("Visible pages:", this.visiblePages);
+            });
 
-            // Initialize filteredCategories first
-            this.updateCategoriesForType(this.newIsIncome ? 'income' : 'expense');
+            this.updateCategoriesForType(this.isIncome ? 'income' : 'expense');
 
             // initialize chart
             const ctx = document.getElementById("summaryChart");
@@ -41,7 +40,7 @@ function dashboardApp() {
                             backgroundColor: ['#2ecc71', '#e74c3c']
                         }]
                     },
-                    options: { responsive: true }
+                    options: {responsive: true}
                 });
 
                 Object.seal(chart)
@@ -49,87 +48,120 @@ function dashboardApp() {
             }
         },
 
-get totalPages() {
-	return Math.max(1, Math.ceil(this.transactions.length / this.pageSize));
-},
+        addCategory() {
+            fetch('/api/categories/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': window.csrf_token,
+                },
+                body: JSON.stringify({
+                    name: this.categoryName,
+                    color: this.categoryColor,
+                    type: this.categoryType,
+                }),
+            })
+                .then(res => {
+                    if (!res.ok) throw new Error('Failed to create category');
+                    return res.json();
+                })
+                .then(data => {
+                    this.$store.app.categories.push(data);
 
-get paginatedTransactions() {
-	const start = (this.currentPage - 1) * this.pageSize;
-	return this.transactions.slice(start, start + this.pageSize);
-},
+                    // Auto-select if it matches current type
+                    const matchesType = this.isIncome
+                        ? data.type === 'income'
+                        : data.type === 'expense';
+                    if (matchesType) this.selectedCategoryId = data.id;
 
-get visiblePages() {
-	const totalPages = this.totalPages;
-	const currentPage = this.currentPage;
-	const visible = [];
-
-	// tweak these
-	const edgeCount = 3;      // how many pages to show near the start or end
-	const windowSize = 1;     // how many pages to show around the current page
-
-	// show all if total pages small
-	if (totalPages <= edgeCount + 2) {
-		for (let i = 1; i <= totalPages; i++) visible.push(i);
-		return visible;
-	}
-
-	const nearStart = currentPage <= edgeCount - 1;
-	const nearEnd = currentPage >= totalPages - edgeCount + 2;
-
-	if (nearStart) {
-		// Example: 1 2 3 4 5 ... 16
-		for (let i = 1; i <= edgeCount; i++) visible.push(i);
-		visible.push('...');
-		visible.push(totalPages);
-	}
-	else if (nearEnd) {
-		// Example: 1 ... 12 13 14 15 16
-		visible.push(1);
-		visible.push('...');
-		for (let i = totalPages - edgeCount + 1; i <= totalPages; i++) visible.push(i);
-	}
-	else {
-		// Example: 1 ... 7 8 9 ... 16
-		const startWindow = currentPage - windowSize;
-		const endWindow = currentPage + windowSize;
-
-		visible.push(1);
-		visible.push('...');
-		for (let i = startWindow; i <= endWindow; i++) visible.push(i);
-		visible.push('...');
-		visible.push(totalPages);
-	}
-
-	return visible;
-},
+                    // Reset + close
+                    this.categoryName = '';
+                    this.categoryColor = '#888888';
+                    this.categoryType = 'expense';
+                    this.showCategoryModal = false;
+                })
+                .catch(err => console.error(err))
+                this.updateCategoriesForType(this.isIncome ? 'income' : 'expense');
+        },
 
 
+        get totalPages() {
+            return Math.max(1, Math.ceil(this.$store.app.transactions.length / this.pageSize));
+        },
+
+        get paginatedTransactions() {
+            const start = (this.currentPage - 1) * this.pageSize;
+            return this.$store.app.transactions.slice(start, start + this.pageSize);
+        },
+
+        get visiblePages() {
+            const totalPages = this.totalPages;
+            const currentPage = this.currentPage;
+            const visible = [];
+
+            // tweak these
+            const edgeCount = 3;      // how many pages to show near the start or end
+            const windowSize = 1;     // how many pages to show around the current page
+
+            // show all if total pages small
+            if (totalPages <= edgeCount + 2) {
+                for (let i = 1; i <= totalPages; i++) visible.push(i);
+                return visible;
+            }
+
+            const nearStart = currentPage <= edgeCount - 1;
+            const nearEnd = currentPage >= totalPages - edgeCount + 2;
+
+            if (nearStart) {
+                // Example: 1 2 3 4 5 ... 16
+                for (let i = 1; i <= edgeCount; i++) visible.push(i);
+                visible.push('...');
+                visible.push(totalPages);
+            } else if (nearEnd) {
+                // Example: 1 ... 12 13 14 15 16
+                visible.push(1);
+                visible.push('...');
+                for (let i = totalPages - edgeCount + 1; i <= totalPages; i++) visible.push(i);
+            } else {
+                // Example: 1 ... 7 8 9 ... 16
+                const startWindow = currentPage - windowSize;
+                const endWindow = currentPage + windowSize;
+
+                visible.push(1);
+                visible.push('...');
+                for (let i = startWindow; i <= endWindow; i++) visible.push(i);
+                visible.push('...');
+                visible.push(totalPages);
+            }
+
+            return visible;
+        },
 
 
-setPage(page) {
-	if (typeof page === 'number' && page >= 1 && page <= this.totalPages) {
-		this.currentPage = page;
-	}
-},
+        setPage(page) {
+            if (typeof page === 'number' && page >= 1 && page <= this.totalPages) {
+                this.currentPage = page;
+            }
+        },
 
-goNextPage() {
-	if (this.currentPage < this.totalPages) this.currentPage++;
-},
+        goNextPage() {
+            if (this.currentPage < this.totalPages) this.currentPage++;
+        },
 
-goPrevPage() {
-	if (this.currentPage > 1) this.currentPage--;
-},
+        goPrevPage() {
+            if (this.currentPage > 1) this.currentPage--;
+        },
 
 
         // Totals
         get incomeTotal() {
-            return this.transactions
+            return this.$store.app.transactions
                 .filter(t => t.is_income)
                 .reduce((sum, t) => sum + parseFloat(t.amount), 0);
         },
 
         get expenseTotal() {
-            return this.transactions
+            return this.$store.app.transactions
                 .filter(t => !t.is_income)
                 .reduce((sum, t) => sum + parseFloat(t.amount), 0);
         },
@@ -138,29 +170,14 @@ goPrevPage() {
             return this.incomeTotal - this.expenseTotal;
         },
 
-        // Category management
-        addCategory() {
-            if (!this.newCategoryName) return;
-            const newCat = {
-                id: Date.now(), // temporary ID
-                name: this.newCategoryName,
-                color: this.newCategoryColor,
-                type: this.newIsIncome ? 'income' : 'expense'
-            };
-            this.categories.push(newCat);
-            this.newCategoryName = '';
-            this.newCategoryColor = '#2ecc71';
-            this.updateFilteredCategories();
-        },
-
         updateCategoriesForType(type) {
-            this.filteredCategories = this.categories.filter(c => c.type === type);
+            this.filteredCategories = this.$store.app.categories.filter(c => c.type === type);
 
             // Update selection
             if (this.filteredCategories.length > 0) {
-                this.newCategory = this.filteredCategories[0].id;
+                this.selectedCategoryId = this.filteredCategories[0].id;
             } else {
-                this.newCategory = null;
+                this.selectedCategoryId = null;
             }
         },
 
@@ -180,25 +197,25 @@ goPrevPage() {
                         "X-CSRFToken": window.csrf_token
                     },
                     body: JSON.stringify({
-                        description: this.newDescription,
-                        amount: this.newAmount,
-                        is_income: this.newIsIncome,
-                        category: this.newCategory
+                        description: this.transactionDescription,
+                        amount: this.transactionAmount,
+                        is_income: this.isIncome,
+                        category: this.selectedCategoryId
                     })
                 });
 
                 if (!response.ok) throw new Error("Failed to save transaction");
 
                 const data = await response.json();
-                this.transactions.unshift(data);
+                this.$store.app.transactions.unshift(data);
                 this.updateChart();
 
                 // Reset form
-                this.newDescription = '';
-                this.newAmount = '';
-                this.newIsIncome = false;
-                this.updateCategoriesForType(this.newIsIncome)
-                this.showModal = false;
+                this.transactionDescription = '';
+                this.transactionAmount = '';
+                this.isIncome = false;
+                this.updateCategoriesForType(this.isIncome)
+                this.showTransactionModal = false;
 
             } catch (e) {
                 console.error(e);

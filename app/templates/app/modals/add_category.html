@@ -1,0 +1,40 @@
+<dialog x-show="showCategoryModal"
+        x-transition
+        :open="showCategoryModal"
+        @click.self="showCategoryModal = false"
+        @keydown.escape.window="showCategoryModal = false"
+        class="modal">
+
+	<article class="modal-content">
+		<h3>Add New Category</h3>
+
+		<form @submit.prevent="addCategory">
+			<label>
+				Name
+				<input type="text" x-model="categoryName" required>
+			</label>
+
+			<label>
+				Color
+				<input type="color" x-model="categoryColor" value="#888888">
+			</label>
+
+			<fieldset>
+				<legend>Type</legend>
+				<label>
+					<input type="radio" name="catType" x-model="categoryType" value="income">
+					Income
+				</label>
+				<label>
+					<input type="radio" name="catType" x-model="categoryType" value="expense">
+					Expense
+				</label>
+			</fieldset>
+
+			<footer class="modal-actions">
+				<button type="submit">Save</button>
+				<button type="button" class="secondary" @click="showCategoryModal = false">Cancel</button>
+			</footer>
+		</form>
+	</article>
+</dialog>

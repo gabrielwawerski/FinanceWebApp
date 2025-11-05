@@ -2,7 +2,6 @@ from django.contrib.auth import login
 from django.contrib.auth.decorators import login_required
 from django.db import models
 from django.shortcuts import render, redirect
-from datetime import date
 import json
 
 from rest_framework import viewsets, permissions
@@ -41,13 +40,15 @@ class TransactionViewSet(viewsets.ModelViewSet):
 		serializer.save(user=self.request.user, category=category)
 
 
-
 class CategoryViewSet(viewsets.ModelViewSet):
 	serializer_class = CategorySerializer
 	permission_classes = [permissions.IsAuthenticated]
 
 	def get_queryset(self):
 		return Category.objects.filter(user=self.request.user)
+
+	def perform_create(self, serializer):
+		serializer.save(user=self.request.user)
 
 
 @login_required
