@@ -6,83 +6,175 @@
 
 {% block content %}
 <div x-data="dashboardApp()" x-init="init()">
-	<button @click="showModal = true" style="outline">Add Transaction</button>
-
 	<!-- Modal -->
-	<dialog open x-show="showModal" x-transition
-		class=""
-		@click.self="showModal = false"
+	<dialog x-show="showModal"
+	        x-transition
+	        :open="showModal"
+			@click.self="if (!isSubmitting) showModal = false"
+	        @keydown.escape.window="if (!isSubmitting) showModal = false"
+            class="modal"
 	>
 		<article class="modal-content">
-			<h3>New Transaction</h3>
+			<h3 style="padding: 0.5rem 0 0.5rem 0;">New Transaction</h3>
 			<form @submit.prevent="addTransaction" style="margin-bottom: 0;">
-				<label>
-					Description
-					<input type="text" x-model="newDescription" required>
-				</label>
-
 				<label>
 					Amount
 					<input type="number" x-model="newAmount" step="0.01" required>
 				</label>
 
-				<fieldset>
-					<legend>Type</legend>
+				<label>
+					Description
+					<input type="text" x-model="newDescription" required>
+				</label>
 
-					<label>
-						<input type="radio" name="type" x-model="newIsIncome" :value="true">
-						Income
-					</label>
+<fieldset>
+    <legend>Type</legend>
+    <label>
+        <input type="radio" name="type" x-model="newIsIncome" :value="true"
+               @change="updateCategoriesForType('income')">
+        Income
+    </label>
+    <label>
+        <input type="radio" name="type" x-model="newIsIncome" :value="false"
+               @change="updateCategoriesForType('expense')">
+        Expense
+    </label>
+</fieldset>
 
-					<label>
-						<input type="radio" name="type" x-model="newIsIncome" :value="false">
-						Expense
-					</label>
-				</fieldset>
+<label>
+    Category
+    <select x-model="newCategory">
+        <template x-for="c in filteredCategories" :key="c.id">
+            <option :value="c.id" :style="`color: ${c.color}`"
+                    x-text="c.name"></option>
+        </template>
+    </select>
+</label>
+
 
 				<footer class="modal-actions">
-					<button type="button" class="secondary" @click="showModal = false" style="min-width: 25%;">Cancel</button>
-					<button type="submit" style="max-width: 25%;">Save</button>
+					<button type="submit"
+					        :aria-busy="isSubmitting"
+					        :disabled="isSubmitting"
+					        style="max-width: 25%;">
+					    <span x-show="!isSubmitting">Save</span>
+					    <span x-show="isSubmitting"></span>
+					</button>
+
+					<button type="button"
+					        class="secondary"
+					        @click="if (!isSubmitting) showModal = false"
+					        :disabled="isSubmitting"
+					        style="min-width: 25%;">
+						Cancel
+					</button>
 				</footer>
 			</form>
 		</article>
 	</dialog>
 
+	<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+        <!-- Add Transaction Button -->
+        <button @click="showModal = true">Add Transaction</button>
+
+        <!-- Current Balance on the right -->
+		<div style="display:flex; flex-direction: column; align-items: flex-end;">
+			<div style="font-weight: bold;">
+				Balance
+			</div>
+			<div style="font-weight: bold; font-size: 1.2rem;"
+			     :style="`color: ${balance < 0 ? '#e74c3c' : '#2ecc71'}`">
+			    $<span x-text="balance.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2}) + '&nbsp;&nbsp;PLN'"></span>
+			</div>
+		</div>
+
+	</div>
+
 	<!-- Transactions Table -->
 	<table>
 		<thead>
 			<tr>
-				<th>Date</th>
-				<th>Description</th>
-				<th>Type</th>
-				<th>Amount</th>
+                <th class="col-date">Date</th>
+                <th class="col-description">Description</th>
+				<th class="col-category">Category</th>
+                <th class="col-type">Type</th>
+                <th class="col-amount">Amount</th>
 			</tr>
 		</thead>
 		<tbody>
-			<template x-for="t in transactions" :key="t.id">
-				<tr>
-					<td x-text="new Date(t.date).toLocaleDateString()"></td>
-					<td x-text="t.description"></td>
-					<td x-text="t.is_income ? 'Income' : 'Expense'"></td>
-					<td x-text="t.amount"></td>
-				</tr>
-			</template>
+		    <template x-for="t in paginatedTransactions" :key="t.id">
+		        <tr>
+					<td x-html="(() => {
+					    const d = new Date(t.date);
+					    const day = String(d.getDate()).padStart(2,'0');
+					    const month = String(d.getMonth()+1).padStart(2,'0');
+					    const year = d.getFullYear();
+					    const hours = String(d.getHours()).padStart(2,'0');
+					    const minutes = String(d.getMinutes()).padStart(2,'0');
+					    return `${day}/${month}/${year}&nbsp;&nbsp;&nbsp;${hours}:${minutes}`;
+					})()"></td>
+		            <td x-text="t.description"></td>
+			        <td>
+					<span
+						:style="`color: ${t.category?.color || '#888'}`"
+						x-text="t.category?.name || 'Uncategorized'">
+					</span>
+				</td>
+		            <td :class="t.is_income ? 'income' : 'expense'" x-text="t.is_income ? 'Income' : 'Expense'"></td>
+		            <td class="col-amount"
+                x-text="parseFloat(t.amount).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2}) + '&nbsp;&nbsp;&nbsp;PLN'">
+            </td>
+		        </tr>
+		    </template>
 		</tbody>
 	</table>
+
+	<!-- Table Pagination -->
+	<div class="table-pagination">
+		<!-- Previous -->
+		<button class="outline" @click="goPrevPage" :disabled="currentPage === 1">&lt;</button>
+
+		<!-- Page buttons -->
+		<template x-for="(p, i) in visiblePages" :key="i">
+			<div>
+				<template x-if="p === '...'">
+					<span class="ellipsis">...</span>
+				</template>
+				<template x-if="p !== '...'">
+					<button
+							class="outline"
+							x-text="p"
+							@click="currentPage = p"
+							:disabled="p === currentPage"
+					></button>
+				</template>
+			</div>
+		</template>
+
+	<!-- Next -->
+	<button class="outline" @click="goNextPage" :disabled="currentPage === totalPages">&gt;</button>
+</div>
+
+
+
+
+
 
 	<!-- Chart -->
 	<article style="max-width: 300px; margin: 2rem auto;">
 		<canvas id="summaryChart"></canvas>
 	</article>
-
 </div>
+
 {% endblock %}
 
 {% block extra_js %}
 <script>
 	window.csrf_token = "{{ csrf_token }}";
 	window.initialTransactions = {{ transactions_json|safe }};
+    window.initialCategories = {{ categories_json|safe }};
 	window.transactionsApiUrl = "{% url 'transaction-list' %}";
+    console.log("initialCategories:", window.initialCategories)
 </script>
 <script src="{% static 'app/js/dashboard.js' %}"></script>
 {% endblock %}

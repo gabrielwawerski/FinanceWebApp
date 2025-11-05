@@ -1,5 +1,6 @@
 from django.contrib.auth import login
 from django.contrib.auth.decorators import login_required
+from django.db import models
 from django.shortcuts import render, redirect
 from datetime import date
 import json
@@ -13,18 +14,37 @@ from app.serializers import TransactionSerializer, CategorySerializer
 
 class TransactionViewSet(viewsets.ModelViewSet):
 	serializer_class = TransactionSerializer
-	# permission_classes = [permissions.IsAuthenticated]
+	permission_classes = [permissions.IsAuthenticated]
 
 	def get_queryset(self):
 		return Transaction.objects.filter(user=self.request.user).order_by('-date')
 
 	def perform_create(self, serializer):
-		serializer.save(user=self.request.user)
+		# Get category ID from request data (optional)
+		category_id = self.request.data.get('category')
+		category = None
+
+		if category_id:
+			try:
+				# Only allow categories belonging to this user OR predefined
+				category = Category.objects.get(
+					id=category_id,
+					user=self.request.user
+				)
+			except Category.DoesNotExist:
+				# optionally check predefined categories
+				try:
+					category = Category.objects.get(id=category_id, predefined=True)
+				except Category.DoesNotExist:
+					category = None
+
+		serializer.save(user=self.request.user, category=category)
+
 
 
 class CategoryViewSet(viewsets.ModelViewSet):
 	serializer_class = CategorySerializer
-	# permission_classes = [permissions.IsAuthenticated]
+	permission_classes = [permissions.IsAuthenticated]
 
 	def get_queryset(self):
 		return Category.objects.filter(user=self.request.user)
@@ -32,26 +52,43 @@ class CategoryViewSet(viewsets.ModelViewSet):
 
 @login_required
 def dashboard_view(request):
-	# Get all transactions for the logged-in user, ordered by newest first
+	# Transactions
 	transactions = Transaction.objects.filter(user=request.user).order_by('-date')
-
-	# Convert queryset to a list of dictionaries suitable for JSON
 	transactions_list = [
 		{
 			"id": t.id,
 			"description": t.description,
-			"amount": float(t.amount),   # decimal → float for JS
+			"amount": float(t.amount),
 			"is_income": t.is_income,
-			"date": t.date.isoformat(),  # JS can parse ISO string
+			"date": t.date.isoformat(),
+			"category": {
+        	    "id": t.category.id if t.category else None,
+        	    "name": t.category.name if t.category else "Uncategorized",
+        	    "color": t.category.color if t.category else "#bdc3c7",
+        	}
 		}
 		for t in transactions
 	]
 
-	# If no transactions, transactions_list will be an empty list: []
+	# Categories
+	categories = Category.objects.filter(models.Q(user=request.user) | models.Q(predefined=True))
+	categories_list = [
+		{
+			"id": c.id,
+			"name": c.name,
+			"color": getattr(c, "color", "#bdc3c7"),
+			"type": c.type,  # income / expense
+		}
+		for c in categories
+	]
+
 	return render(
 		request,
 		'app/dashboard.html',
-		{'transactions_json': json.dumps(transactions_list)}
+		{
+			'transactions_json': json.dumps(transactions_list),
+			'categories_json': json.dumps(categories_list)
+		}
 	)
 
 

@@ -17,29 +17,32 @@
 </head>
 <body>
 <header>
-	<nav class="container">
-	<ul>
-		<li><a href="{% url 'dashboard' %}">Dashboard</a></li>
-	</ul>
+  <nav class="container" aria-label="Main navigation">
+    <!-- Left links -->
+    <ul class="nav-left">
+      <li><a href="{% url 'dashboard' %}">Dashboard</a></li>
+    </ul>
 
-	<ul>
-		{% if user.is_authenticated %}
-			<li><span>{{ user.username }}</span></li>
+    <!-- Right links -->
+    <ul class="nav-right">
+      {% if user.is_authenticated %}
+        <li><span>{{ user.username }}</span></li>
+        <li>
+  <form id="logout-form" method="post" action="{% url 'logout' %}" style="display:inline;">
+    {% csrf_token %}
+    <a href="#" onclick="document.getElementById('logout-form').submit(); return false;">
+      Logout
+    </a>
+  </form>
+</li>
 
-			<!-- Logout link disguised as normal nav link -->
-			<li>
-				<form id="logout-form" method="post" action="{% url 'logout' %}" style="display:inline;">
-					{% csrf_token %}
-					<a href="#" onclick="document.getElementById('logout-form').submit(); return false;">Logout</a>
-				</form>
-			</li>
-		{% else %}
-			<li><a href="{% url 'login' %}">Login</a></li>
-			<li><a href="{% url 'register' %}">Register</a></li>
-		{% endif %}
-	</ul>
-	</nav>
-	</header>
+      {% else %}
+        <li><a href="{% url 'login' %}">Login</a></li>
+        <li><a href="{% url 'register' %}">Register</a></li>
+      {% endif %}
+    </ul>
+  </nav>
+</header>
 
 	<main class="container">
 		{% block content %}{% endblock %}
@@ -48,7 +51,7 @@
 	<footer class="container">
 		<p>&copy; 2025 Finance App</p>
 	</footer>
-
-	{% block extra_js %}{% endblock %}
+	{% block extra_js %}
+	{% endblock %}
 </body>
 </html>

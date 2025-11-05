@@ -3,8 +3,16 @@ from django.contrib.auth.models import User
 
 
 class Category(models.Model):
-	user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="categories")
+	CATEGORY_TYPE_CHOICES = [
+		('income', 'Income'),
+		('expense', 'Expense'),
+	]
+
+	user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="categories", null=True, blank=True)
 	name = models.CharField(max_length=100)
+	color = models.CharField(max_length=7, default="#3498db")  # store hex color
+	predefined = models.BooleanField(default=False)  # True for default categories
+	type = models.CharField(max_length=7, choices=CATEGORY_TYPE_CHOICES, default='expense')
 
 	def __str__(self):
 		return self.name

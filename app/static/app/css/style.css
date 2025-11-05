@@ -20,3 +20,111 @@ fieldset label {
 	align-items: center;
 	gap: 0.3rem;
 }
+
+/* Navbar flex layout */
+nav.container {
+    display: flex;
+    align-items: center;
+}
+
+/* Left links */
+nav.container .nav-left {
+    display: flex;
+    gap: 1rem;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+/* Right links */
+nav.container .nav-right {
+    display: flex;
+    gap: 1rem;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    margin-left: auto; /* pushes this group to the right */
+}
+
+div.pagination button[disabled] {
+    font-weight: bold;
+    background-color: #eee;
+    cursor: default;
+}
+
+
+/*********** TABLE ***********/
+table {
+    table-layout: fixed;  /* forces columns to stay the same width */
+    width: 100%;          /* use full width */
+}
+
+table th, table td {
+    overflow: hidden;     /* hide overflow if content is too long */
+    text-overflow: ellipsis; /* optional: show "..." if content is long */
+    white-space: nowrap;  /* prevent text wrapping */
+}
+
+/* Date column width */
+table .col-date {
+    width: 20%;
+}
+
+/* Make description column wider */
+table .col-description {
+    width: 50%;      /* expand to half of table */
+    word-break: break-word; /* prevent overflow */
+}
+
+table .col-category {
+	width: 15%;
+	text-align: center;
+	font-weight: 500;
+}
+
+/* Optionally, type column width */
+table .col-type {
+    width: 10%;
+}
+
+/* Align amount column to right */
+table .col-amount {
+    text-align: right;
+    width: 15%;      /* optional fixed width */
+}
+
+.income {
+    color: #2ecc71; /* green */
+    /*font-weight: bold;*/
+}
+
+.expense {
+    color: #e74c3c; /* red */
+    /*font-weight: bold;*/
+}
+
+.table-fade {
+  transition: opacity 0.2s ease-in-out;
+}
+
+.table-pagination {
+	display: flex;
+	gap: 0.4rem;
+	align-items: center;
+	justify-content: flex-end;
+}
+
+.table-pagination button {
+    padding: 0.25rem 0.5rem;   /* smaller buttons */
+    min-width: 1.8rem;         /* consistent size */
+    font-size: 0.8rem;
+}
+
+.table-pagination .ellipsis {
+	color: #999;
+	font-weight: bold;
+	user-select: none;
+    display: inline-block;
+	vertical-align: bottom;
+	padding: 0 0.4rem;
+}
