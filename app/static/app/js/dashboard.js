@@ -20,6 +20,10 @@ document.addEventListener('alpine:init', () => {
         },
 
         init() {
+            window.addEventListener('DOMContentLoaded', () => {
+                this.isMobile = window.innerWidth <= this.mobileBreakpoint;
+            })
+
             // Update isMobile whenever window resizes
             window.addEventListener('resize', () => {
                 this.isMobile = window.innerWidth <= this.mobileBreakpoint;

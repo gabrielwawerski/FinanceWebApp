@@ -10,10 +10,10 @@
 		{% include "app/modals/add_transaction.html" %}
 
 		<div class="transactions-header">
-						<!-- Filters for mobile only -->
-    <div x-show="$store.app.isMobile">
-        {% include "app/components/dashboard/transaction_filters.html" %}
-    </div>
+			<!-- Filters for mobile only -->
+			<div x-show="$store.app.isMobile">
+				{% include "app/components/dashboard/transaction_filters.html" %}
+			</div>
 
 			<!-- Add Transaction Button -->
 			<button class="add-transaction-button" @click="showTransactionModal = true">Add Transaction</button>
@@ -113,10 +113,10 @@
 		</table>
 
 		<div class="transaction-footer">
-    <!-- Filters for desktop only -->
-    <div x-show="!$store.app.isMobile">
-        {% include "app/components/dashboard/transaction_filters.html" %}
-    </div>
+			<!-- Filters for desktop only -->
+			<div x-show="!$store.app.isMobile">
+				{% include "app/components/dashboard/transaction_filters.html" %}
+			</div>
 
 			<!-- Table Pagination -->
 			<div class="table-pagination" x-show="totalPages > 1">
@@ -158,7 +158,7 @@
 {% block extra_js %}
 <script>
     window.csrf_token = "{{ csrf_token }}";
-    window.initialTransactions = {{ transactions_json | safe}};
+    window.initialTransactions = {{ transactions_json | safe }};
     window.initialCategories = {{ categories_json | safe }};
     window.transactionsApiUrl = "{% url 'transaction-list' %}";
     console.log("initialCategories:", window.initialCategories)
