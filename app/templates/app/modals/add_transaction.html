@@ -1,6 +1,7 @@
 <dialog x-show="showTransactionModal"
         x-transition
         :open="showTransactionModal"
+        x-trap.noscroll="showTransactionModal"
         @click.self="if (!isSubmitting) showTransactionModal = false"
         @keydown.escape.window="if (!isSubmitting && !$store.app.showCategoryModal) showTransactionModal = false"
         class="modal">
@@ -9,7 +10,7 @@
 		<form @submit.prevent="addTransaction" style="margin-bottom: 0;">
 			<label>
 				Amount
-				<input type="number" x-model="transactionAmount" step="0.01" required>
+				<input type="number" x-model="transactionAmount" step="1" required>
 			</label>
 
 			<label>
@@ -61,7 +62,9 @@
 				        :aria-busy="isSubmitting"
 				        :disabled="isSubmitting"
 				        style="max-width: 25%;">
-					<span x-show="!isSubmitting">Save</span>
+					<span x-show="!isSubmitting">
+						Save
+					</span>
 					<span x-show="isSubmitting"></span>
 				</button>
 

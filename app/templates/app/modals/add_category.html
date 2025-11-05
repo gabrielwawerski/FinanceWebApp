@@ -7,9 +7,9 @@
         class="modal">
 
 	<article class="modal-content">
-		<h3>Add New Category</h3>
+		<h3 style="padding: 0.5rem 0 0.5rem 0;">Add New Category</h3>
 
-		<form @submit.prevent="addCategory">
+		<form @submit.prevent="addCategory" style="margin-bottom: 0;">
 			<label>
 				Name
 				<input type="text" x-model="categoryName" required>
@@ -33,8 +33,8 @@
 			</fieldset>
 
 			<footer class="modal-actions">
-				<button type="submit">Save</button>
-				<button type="button" class="secondary" @click="close()">Cancel</button>
+				<button type="submit" style="max-width: 25%;">Save</button>
+				<button type="button" style="min-width: 25%;" class="secondary" @click="close()">Cancel</button>
 			</footer>
 		</form>
 	</article>

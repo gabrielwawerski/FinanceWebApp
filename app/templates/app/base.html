@@ -54,6 +54,7 @@
 	{% block extra_js %}
 	{% endblock %}
 	<!-- Load Alpine first -->
+<script src="{% static 'app/js/vendor/alpine.focus.min.js' %}" defer data-turbo-eval="false"></script>
 <script src="{% static 'app/js/vendor/alpine.min.js' %}" defer data-turbo-eval="false"></script>
 
 <!-- Load your component scripts AFTER Alpine -->

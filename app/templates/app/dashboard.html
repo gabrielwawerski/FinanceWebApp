@@ -6,34 +6,91 @@
 
 {% block content %}
 <div>
-	<div x-data="transactionApp()" x-init="init()">
+	<div x-data="transactionApp()">
 		{% include "app/modals/add_transaction.html" %}
 
-		<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
-			<!-- Add Transaction Button -->
-			<button @click="showTransactionModal = true">Add Transaction</button>
-
-			<!-- Current Balance on the right -->
-			<div style="display:flex; flex-direction: column; align-items: flex-end;">
-				<div style="font-weight: bold;">
-					Balance
-				</div>
-				<div
-				     :style="`color: ${balance < 0 ? '#e74c3c' : '#2ecc71'}`">
-					<span style="font-weight: bold; font-size: 1.2rem;" x-text="balance.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2}) + '&nbsp;PLN'"></span>
-				</div>
+		<!-- Current Balance on the right -->
+		<div style="display:flex; flex-direction: column; align-items: flex-end;">
+			<div style="font-weight: bold;">
+				Balance
+			</div>
+			<div
+				:style="`color: ${balance < 0 ? '#e74c3c' : '#2ecc71'}`">
+				<span style="font-weight: bold; font-size: 1.2rem;"
+				      x-text="balance.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2}) + '&nbsp;PLN'"></span>
 			</div>
 		</div>
 
+		<div class="transactions-header">
+			<!-- Add Transaction Button -->
+			<button @click="showTransactionModal = true">Add Transaction</button>
+
+			<!-- Filters -->
+<!--	TODO: bugs when category is selected and we swap the type		-->
+			<div class="transactions-filters">
+				<select x-model="filters.type" class="filter-input">
+					<option value="">All Types</option>
+					<option value="income">Income</option>
+					<option value="expense">Expense</option>
+				</select>
+
+				<select x-model="filters.category" class="filter-input">
+					<option value="">All Categories</option>
+					<template x-for="c in filteredCategoriesForFilter" :key="c.id">
+						<option :value="c.id" x-text="c.name" :style="`color: ${c.color}`"></option>
+					</template>
+				</select>
+
+				<input type="text" placeholder="Search description..." x-model="filters.description" class="filter-input">
+			</div>
+
+		</div>
+
 		<!-- Transactions Table -->
-		<table>
+		<table class="transactions-table">
 			<thead>
 			<tr>
-				<th class="col-date">Date</th>
-				<th class="col-description">Description</th>
-				<th class="col-category">Category</th>
-				<th class="col-type">Type</th>
-				<th class="col-amount">Amount</th>
+				<th class="col-date" @click="toggleSort('date')">Date
+					<template x-if="sort.direction">
+				<span x-show="sort.column === 'date'">
+				    <span x-show="sort.direction === 'asc'">↑</span>
+				    <span x-show="sort.direction === 'desc'">↓</span>
+				</span>
+						</template>
+				</th>
+				<th class="col-description" @click="toggleSort('description')">Description
+					<template x-if="sort.direction">
+				<span x-show="sort.column === 'description'">
+				    <span x-show="sort.direction === 'asc'">↑</span>
+				    <span x-show="sort.direction === 'desc'">↓</span>
+				</span>
+						</template>
+				</th>
+				<th class="col-category" @click="toggleSort('category')">
+					<template x-if="sort.direction">
+					<span x-show="sort.column === 'category'">
+				    <span x-show="sort.direction === 'asc'">↑</span>
+				    <span x-show="sort.direction === 'desc'">↓</span>
+				</span>
+						</template>
+					Category
+				</th>
+				<th class="col-type" @click="toggleSort('type')">Type
+					<template x-if="sort.direction">
+				<span x-show="sort.column === 'type'">
+				    <span x-show="sort.direction === 'asc'">↑</span>
+				    <span x-show="sort.direction === 'desc'">↓</span>
+				</span>
+						</template>
+				</th>
+				<th class="col-amount" @click="toggleSort('amount')">
+					<template x-if="sort.direction">
+					<span x-show="sort.column === 'amount'">
+				    <span x-show="sort.direction === 'asc'">↑</span>
+				    <span x-show="sort.direction === 'desc'">↓</span>
+				</span>
+						</template>
+					Amount</th>
 			</tr>
 			</thead>
 			<tbody>
@@ -51,8 +108,8 @@
 					<td x-text="t.description"></td>
 					<td style="text-align: end;">
 					<span
-							:style="`color: ${t.category?.color || '#888'};`"
-							x-text="t.category?.name || 'Uncategorized'">
+						:style="`color: ${t.category?.color || '#888'};`"
+						x-text="t.category?.name || 'Uncategorized'">
 					</span>
 					</td>
 					<td :class="t.is_income ? 'income' : 'expense'" x-text="t.is_income ? 'Income' : 'Expense'"></td>
@@ -64,31 +121,31 @@
 			</tbody>
 		</table>
 
-			<!-- Table Pagination -->
-			<div class="table-pagination" x-show="totalPages > 1">
-				<!-- Previous -->
-				<button class="outline" @click="goPrevPage" :disabled="currentPage === 1">&lt;</button>
+		<!-- Table Pagination -->
+		<div class="table-pagination" x-show="totalPages > 1">
+			<!-- Previous -->
+			<button class="outline" @click="goPrevPage" :disabled="currentPage === 1">&lt;</button>
 
-				<!-- Page buttons -->
-				<template x-for="(p, i) in visiblePages" :key="i">
-					<div>
-						<template x-if="p === '...'">
-							<span class="ellipsis">...</span>
-						</template>
-						<template x-if="p !== '...'">
-							<button
-									class="outline"
-									x-text="p"
-									@click="currentPage = p"
-									:disabled="p === currentPage"
-							></button>
-						</template>
-					</div>
-				</template>
+			<!-- Page buttons -->
+			<template x-for="(p, i) in visiblePages" :key="i">
+				<div>
+					<template x-if="p === '...'">
+						<span class="ellipsis">...</span>
+					</template>
+					<template x-if="p !== '...'">
+						<button
+							class="outline"
+							x-text="p"
+							@click="currentPage = p"
+							:disabled="p === currentPage"
+						></button>
+					</template>
+				</div>
+			</template>
 
-				<!-- Next -->
-				<button class="outline" @click="goNextPage" :disabled="currentPage === totalPages">&gt;</button>
-			</div>
+			<!-- Next -->
+			<button class="outline" @click="goNextPage" :disabled="currentPage === totalPages">&gt;</button>
+		</div>
 
 	</div>
 
@@ -97,7 +154,7 @@
 	</div>
 
 	<!-- Chart -->
-	<div x-data="chartApp()" x-init="init()" style="max-width: 300px; margin: 2rem auto;">
+	<div x-data="chartApp()" style="max-width: 300px; margin: 2rem auto;">
 		<canvas id="summaryChart"></canvas>
 	</div>
 </div>
@@ -106,10 +163,10 @@
 
 {% block extra_js %}
 <script>
-	window.csrf_token = "{{ csrf_token }}";
-	window.initialTransactions = {{ transactions_json|safe }};
-    window.initialCategories = {{ categories_json|safe }};
-	window.transactionsApiUrl = "{% url 'transaction-list' %}";
+    window.csrf_token = "{{ csrf_token }}";
+    window.initialTransactions = {{ transactions_json | safe}};
+    window.initialCategories = {{ categories_json | safe }};
+    window.transactionsApiUrl = "{% url 'transaction-list' %}";
     console.log("initialCategories:", window.initialCategories)
 </script>
 {% endblock %}
