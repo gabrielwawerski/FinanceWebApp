@@ -11,19 +11,19 @@
 
 		<div class="transactions-header">
 			<!-- Add Transaction Button -->
-			<button @click="showTransactionModal = true">Add Transaction</button>
+			<button class="add-transaction-button" @click="showTransactionModal = true">Add Transaction</button>
 
-					<!-- Current Balance on the right -->
-		<div style="display:flex; flex-direction: column; align-items: flex-end;">
-			<div style="font-weight: bold;">
-				Balance
-			</div>
-			<div
-				:style="`color: ${balance < 0 ? '#e74c3c' : '#2ecc71'}`">
+			<!-- Current Balance on the right -->
+			<div style="display:flex; flex-direction: column; align-items: flex-end;">
+				<div style="font-weight: bold;">
+					Balance
+				</div>
+				<div
+					:style="`color: ${balance < 0 ? '#e74c3c' : '#2ecc71'}`">
 				<span style="font-weight: bold; font-size: 1.2rem;"
 				      x-text="balance.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2}) + '&nbsp;PLN'"></span>
+				</div>
 			</div>
-		</div>
 
 		</div>
 
@@ -37,7 +37,7 @@
 				    <span x-show="sort.direction === 'asc'">↑</span>
 				    <span x-show="sort.direction === 'desc'">↓</span>
 				</span>
-						</template>
+					</template>
 				</th>
 				<th class="col-description" @click="toggleSort('description')">Description
 					<template x-if="sort.direction">
@@ -45,7 +45,7 @@
 				    <span x-show="sort.direction === 'asc'">↑</span>
 				    <span x-show="sort.direction === 'desc'">↓</span>
 				</span>
-						</template>
+					</template>
 				</th>
 				<th class="col-category" @click="toggleSort('category')">
 					<template x-if="sort.direction">
@@ -53,7 +53,7 @@
 				    <span x-show="sort.direction === 'asc'">↑</span>
 				    <span x-show="sort.direction === 'desc'">↓</span>
 				</span>
-						</template>
+					</template>
 					Category
 				</th>
 				<th class="col-type" @click="toggleSort('type')">Type
@@ -62,7 +62,7 @@
 				    <span x-show="sort.direction === 'asc'">↑</span>
 				    <span x-show="sort.direction === 'desc'">↓</span>
 				</span>
-						</template>
+					</template>
 				</th>
 				<th class="col-amount" @click="toggleSort('amount')">
 					<template x-if="sort.direction">
@@ -70,8 +70,9 @@
 				    <span x-show="sort.direction === 'asc'">↑</span>
 				    <span x-show="sort.direction === 'desc'">↓</span>
 				</span>
-						</template>
-					Amount</th>
+					</template>
+					Amount
+				</th>
 			</tr>
 			</thead>
 			<tbody>
@@ -92,12 +93,13 @@
 					<td data-label="Description" x-text="t.description"></td>
 					<td class="col-category" data-label="Category">
 					<span class="col-type"
-						:style="`color: ${t.category?.color || '#888'};`"
-						x-text="t.category?.name || 'Uncategorized'">
+					      :style="`color: ${t.category?.color || '#888'};`"
+					      x-text="t.category?.name || 'Uncategorized'">
 					</span>
 					</td>
-					<td data-label="Type" :class="t.is_income ? 'income' : 'expense'" x-text="t.is_income ? 'Income' : 'Expense'"></td>
-					<td data-label="Amount" colspan=""  class="col-amount"
+					<td data-label="Type" :class="t.is_income ? 'income' : 'expense'"
+					    x-text="t.is_income ? 'Income' : 'Expense'"></td>
+					<td data-label="Amount" colspan="" class="col-amount"
 					    x-text="parseFloat(t.amount).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2}) + '&nbsp;&nbsp;&nbsp;PLN'">
 					</td>
 				</tr>
@@ -106,57 +108,35 @@
 		</table>
 
 		<div class="transaction-footer">
-						<!-- Filters -->
-<!--	TODO: bugs when category is selected and we swap the type		-->
-			<div class="transactions-filters">
-				<select x-model="filters.type" class="filter-input">
-					<option value="">All Types</option>
-					<option value="income">Income</option>
-					<option value="expense">Expense</option>
-				</select>
+			{% include "app/components/dashboard/transaction_filters.html" %}
 
-				<select x-model="filters.category" class="filter-input">
-					<option value="">All Categories</option>
-					<template x-for="c in filteredCategoriesForFilter" :key="c.id">
-						<option :value="c.id" x-text="c.name" :style="`color: ${c.color}`"></option>
-					</template>
-				</select>
+			<!-- Table Pagination -->
+			<div class="table-pagination" x-show="totalPages > 1">
+				<!-- Previous -->
+				<button class="outline" @click="goPrevPage" :disabled="currentPage === 1">&lt;</button>
 
-				<input type="text" placeholder="Search description..." x-model="filters.description" class="filter-input">
+				<!-- Page buttons -->
+				<template x-for="(p, i) in visiblePages" :key="i">
+					<div>
+						<template x-if="p === '...'">
+							<span class="ellipsis">...</span>
+						</template>
+						<template x-if="p !== '...'">
+							<button
+								class="outline"
+								x-text="p"
+								@click="currentPage = p"
+								:disabled="p === currentPage"
+							></button>
+						</template>
+					</div>
+				</template>
+
+				<!-- Next -->
+				<button class="outline" @click="goNextPage" :disabled="currentPage === totalPages">&gt;</button>
 			</div>
-
-
-		<!-- Table Pagination -->
-		<div class="table-pagination" x-show="totalPages > 1">
-			<!-- Previous -->
-			<button class="outline" @click="goPrevPage" :disabled="currentPage === 1">&lt;</button>
-
-			<!-- Page buttons -->
-			<template x-for="(p, i) in visiblePages" :key="i">
-				<div>
-					<template x-if="p === '...'">
-						<span class="ellipsis">...</span>
-					</template>
-					<template x-if="p !== '...'">
-						<button
-							class="outline"
-							x-text="p"
-							@click="currentPage = p"
-							:disabled="p === currentPage"
-						></button>
-					</template>
-				</div>
-			</template>
-
-			<!-- Next -->
-			<button class="outline" @click="goNextPage" :disabled="currentPage === totalPages">&gt;</button>
 		</div>
-			</div>
 
-	</div>
-
-	<div x-data="categoryApp()">
-		{% include "app/modals/add_category.html" %}
 	</div>
 
 	<!-- Chart -->

@@ -18,7 +18,7 @@
 				<input type="text" x-model="transactionDescription" required>
 			</label>
 
-			<fieldset>
+			<fieldset style="display:flex; flex-direction: row; width: 100%; align-items: center; justify-content: center;">
 				<legend>Type</legend>
 				<label>
 					<input type="radio" name="type"
@@ -79,3 +79,7 @@
 		</form>
 	</article>
 </dialog>
+
+<div x-data="categoryApp()">
+	{% include "app/modals/add_category.html" %}
+</div>

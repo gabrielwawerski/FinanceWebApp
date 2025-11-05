@@ -1,5 +1,5 @@
 .modal-content {
-    max-width: 600px;
+    max-width: 350px;
 }
 
 .modal-actions {
@@ -223,6 +223,23 @@ table .col-amount {
         word-break: normal; /* optional, or keep break-word */
     }
 
+    .modal {
+        align-items: flex-start;
+    }
+
+    .modal-content {
+        max-width: 100%;
+    }
+
+    .transactions-header {
+        flex-direction: column-reverse;
+        gap: 1rem;
+    }
+
+    .add-transaction-button {
+        margin-top: 1rem;
+    }
+
     .transaction-footer {
         flex-direction: column-reverse;
         justify-content: center;
@@ -257,10 +274,12 @@ table .col-amount {
         display: flex;
         justify-content: space-between; /* label on left, value on right */
         padding: 0.5rem 0;
+        font-weight: bold;
     }
 
     td::before {
         content: attr(data-label); /* label from data-label attribute */
         font-weight: bold;
+        color: initial;
     }
 }

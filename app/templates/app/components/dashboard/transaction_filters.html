@@ -1,0 +1,17 @@
+<!--	TODO: bugs when category is selected and we swap the type		-->
+<div class="transactions-filters">
+	<select x-model="filters.type" class="filter-input">
+		<option value="">All Types</option>
+		<option value="income">Income</option>
+		<option value="expense">Expense</option>
+	</select>
+
+	<select x-model="filters.category" class="filter-input">
+		<option value="">All Categories</option>
+		<template x-for="c in filteredCategoriesForFilter" :key="c.id">
+			<option :value="c.id" x-text="c.name" :style="`color: ${c.color}`"></option>
+		</template>
+	</select>
+
+	<input type="text" placeholder="Search description..." x-model="filters.description" class="filter-input">
+</div>

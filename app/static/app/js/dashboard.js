@@ -8,9 +8,23 @@ document.addEventListener('alpine:init', () => {
             this.isIncome = income;
         },
 
+        mobileBreakpoint: 800,
+        isMobile: window.innerWidth <= this.mobileBreakpoint,
+
         showCategoryModal: false,
-        openCategoryModal()  { this.showCategoryModal = true; },
-        closeCategoryModal() { this.showCategoryModal = false; },
+        openCategoryModal() {
+            this.showCategoryModal = true;
+        },
+        closeCategoryModal() {
+            this.showCategoryModal = false;
+        },
+
+        init() {
+            // Update isMobile whenever window resizes
+            window.addEventListener('resize', () => {
+                this.isMobile = window.innerWidth <= this.mobileBreakpoint;
+            });
+        },
 
         get incomeTotal() {
             return this.transactions
@@ -36,4 +50,5 @@ document.addEventListener('alpine:init', () => {
             this.categories.push(category);
         },
     });
+    Alpine.store('app').init();
 });

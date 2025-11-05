@@ -18,52 +18,50 @@
 <body>
 
 <header>
-  <nav class="container" aria-label="Main navigation">
-    <!-- Left links -->
-    <ul class="nav-left">
-      <li><a href="{% url 'dashboard' %}">Dashboard</a></li>
-    </ul>
+	<nav class="container" aria-label="Main navigation">
+		<!-- Left links -->
+		<ul class="nav-left">
+			<li><a href="{% url 'dashboard' %}">Dashboard</a></li>
+		</ul>
 
-    <!-- Right links -->
-    <ul class="nav-right">
-      {% if user.is_authenticated %}
-        <li><span>{{ user.username }}</span></li>
-        <li>
-  <form id="logout-form" method="post" action="{% url 'logout' %}" style="display:inline;">
-    {% csrf_token %}
-    <a href="#" onclick="document.getElementById('logout-form').submit(); return false;">
-      Logout
-    </a>
-  </form>
-</li>
+		<!-- Right links -->
+		<ul class="nav-right">
+			{% if user.is_authenticated %}
+			<li><span>{{ user.username }}</span></li>
+			<li>
+				<form id="logout-form" method="post" action="{% url 'logout' %}" style="display:inline;">
+					{% csrf_token %}
+					<a href="#" onclick="document.getElementById('logout-form').submit(); return false;">
+						Logout
+					</a>
+				</form>
+			</li>
 
-      {% else %}
-        <li><a href="{% url 'login' %}">Login</a></li>
-        <li><a href="{% url 'register' %}">Register</a></li>
-      {% endif %}
-    </ul>
-  </nav>
+			{% else %}
+			<li><a href="{% url 'login' %}">Login</a></li>
+			<li><a href="{% url 'register' %}">Register</a></li>
+			{% endif %}
+		</ul>
+	</nav>
 </header>
 
-	<main class="container">
-		{% block content %}{% endblock %}
-	</main>
+<main class="container">
+	{% block content %}{% endblock %}
+</main>
 
-	<footer class="container">
-		<p>&copy; 2025 Finance App</p>
-	</footer>
-	{% block extra_js %}
-	{% endblock %}
-	<!-- Load Alpine first -->
+<footer class="container">
+	<p>&copy; 2025 Finance App</p>
+</footer>
+{% block extra_js %}
+{% endblock %}
+<!-- Load Alpine first -->
 <script src="{% static 'app/js/vendor/alpine.focus.min.js' %}" defer data-turbo-eval="false"></script>
-<script src="{% static 'app/js/vendor/alpine.min.js' %}" defer data-turbo-eval="false"></script>
+<script src="{% static 'app/js/vendor/alpine.min.js' %}" defer ></script>
 
-<!-- Load your component scripts AFTER Alpine -->
+<!-- Load components after Alpine -->
 <script src="{% static 'app/js/dashboard.js' %}"></script>
 <script src="{% static 'app/js/components/category_component.js' %}"></script>
 <script src="{% static 'app/js/components/transaction_component.js' %}"></script>
 <script src="{% static 'app/js/components/chart_component.js' %}"></script>
-
-<!-- Start Alpine manually AFTER all components are loaded -->
 </body>
 </html>

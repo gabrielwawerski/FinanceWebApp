@@ -7,7 +7,7 @@
         class="modal">
 
 	<article class="modal-content">
-		<h3 style="padding: 0.5rem 0 0.5rem 0;">Add New Category</h3>
+		<h3 style="padding: 0.5rem 0 0.5rem 0;">New Category</h3>
 
 		<form @submit.prevent="addCategory" style="margin-bottom: 0;">
 			<label>
@@ -20,7 +20,7 @@
 				<input type="color" x-model="categoryColor" value="#888888">
 			</label>
 
-			<fieldset>
+			<fieldset style="display:flex; flex-direction: row; width: 100%; align-items: center; justify-content: center;">
 				<legend>Type</legend>
 				<label>
 					<input type="radio" name="catType" x-model="categoryType" value="income">
