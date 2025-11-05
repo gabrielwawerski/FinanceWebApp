@@ -151,8 +151,8 @@ table .col-amount {
 .transactions-table {
     user-select: none; /* prevents selection */
     -webkit-user-select: none; /* Safari/Chrome */
-    -moz-user-select: none;    /* Firefox */
-    -ms-user-select: none;     /* IE10+ */
+    -moz-user-select: none; /* Firefox */
+    -ms-user-select: none; /* IE10+ */
 }
 
 .transactions-table th {
@@ -166,4 +166,101 @@ table .col-amount {
 
 .transactions-table th span {
     font-size: 0.8rem;
+}
+
+.transaction-footer {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 1rem;
+}
+
+@media screen and (max-width: 1300px) {
+        table .col-date,
+    table .col-description,
+    table .col-category,
+    table .col-type,
+    table .col-amount {
+        width: auto; /* remove fixed widths */
+        text-align: left; /* optional: reset alignment */
+    }
+
+    table .col-amount {
+        width: 20%;
+        text-align: right;
+    }
+
+    table .col-type {
+        width: 15%;
+    }
+
+    table .col-category {
+        text-align: end;
+    }
+
+    table .col-amount {
+        text-align: right;
+    }
+}
+
+/* Mobile breakpoint: reset widths */
+@media screen and (max-width: 800px) {
+    table .col-date,
+    table .col-description,
+    table .col-category,
+    table .col-type,
+    table .col-amount {
+        width: auto; /* remove fixed widths */
+        text-align: left; /* optional: reset alignment */
+    }
+
+    table .col-amount {
+        text-align: right; /* keep amounts aligned right if needed */
+    }
+
+    table .col-description {
+        word-break: normal; /* optional, or keep break-word */
+    }
+
+    .transaction-footer {
+        flex-direction: column-reverse;
+        justify-content: center;
+        gap: 1rem;
+    }
+
+    .transactions-filters {
+        flex-direction: column;
+        align-items: center;
+        gap: 1rem;
+        min-width: 100%;
+    }
+
+    .filter-input {
+        width: 100%;
+    }
+
+        table, thead, tbody, th, td, tr {
+        display: block; /* make rows stack vertically */
+    }
+
+    thead tr {
+        display: none; /* hide header row */
+    }
+
+    tr {
+        margin-bottom: 1rem;
+        border-bottom: 1px solid #ccc;
+    }
+
+    td {
+        display: flex;
+        justify-content: space-between; /* label on left, value on right */
+        padding: 0.5rem 0;
+    }
+
+    td::before {
+        content: attr(data-label); /* label from data-label attribute */
+        font-weight: bold;
+    }
 }
