@@ -11,9 +11,9 @@
 
 		<div class="transactions-header">
 			<!-- Filters for mobile only -->
-			<div x-show="$store.app.isMobile">
+			<template x-if="$store.app.isMobile" x-cloak>
 				{% include "app/components/dashboard/transaction_filters.html" %}
-			</div>
+			</template>
 
 			<!-- Add Transaction Button -->
 			<button class="add-transaction-button" @click="showTransactionModal = true">Add Transaction</button>
@@ -33,7 +33,7 @@
 		</div>
 
 		<!-- Transactions Table -->
-		<table class="transactions-table">
+		<table class="transactions-table" x-cloak>
 			<thead>
 			<tr>
 				<th class="col-date" @click="toggleSort('date')">Date
@@ -114,12 +114,12 @@
 
 		<div class="transaction-footer">
 			<!-- Filters for desktop only -->
-			<div x-show="!$store.app.isMobile">
+			<div x-show="!$store.app.isMobile" x-cloak>
 				{% include "app/components/dashboard/transaction_filters.html" %}
 			</div>
 
 			<!-- Table Pagination -->
-			<div class="table-pagination" x-show="totalPages > 1">
+			<div class="table-pagination" x-show="totalPages > 1" x-cloak>
 				<!-- Previous -->
 				<button class="outline" @click="goPrevPage" :disabled="currentPage === 1">&lt;</button>
 
@@ -143,7 +143,7 @@
 				<!-- Next -->
 				<button class="outline" @click="goNextPage" :disabled="currentPage === totalPages">&gt;</button>
 			</div>
-		</div>
+		</template>
 
 	</div>
 
