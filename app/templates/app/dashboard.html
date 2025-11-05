@@ -32,124 +32,12 @@
 
 		</div>
 
-		<!-- Transactions Table -->
-		<table class="transactions-table" x-cloak>
-			<thead>
-			<tr>
-				<th class="col-date" @click="toggleSort('date')">Date
-					<template x-if="sort.direction">
-				<span x-show="sort.column === 'date'">
-				    <span x-show="sort.direction === 'asc'">↑</span>
-				    <span x-show="sort.direction === 'desc'">↓</span>
-				</span>
-					</template>
-				</th>
-				<th class="col-description" @click="toggleSort('description')">Description
-					<template x-if="sort.direction">
-				<span x-show="sort.column === 'description'">
-				    <span x-show="sort.direction === 'asc'">↑</span>
-				    <span x-show="sort.direction === 'desc'">↓</span>
-				</span>
-					</template>
-				</th>
-				<th class="col-category" @click="toggleSort('category')">
-					<template x-if="sort.direction">
-					<span x-show="sort.column === 'category'">
-				    <span x-show="sort.direction === 'asc'">↑</span>
-				    <span x-show="sort.direction === 'desc'">↓</span>
-				</span>
-					</template>
-					Category
-				</th>
-				<th class="col-type" @click="toggleSort('type')">Type
-					<template x-if="sort.direction">
-				<span x-show="sort.column === 'type'">
-				    <span x-show="sort.direction === 'asc'">↑</span>
-				    <span x-show="sort.direction === 'desc'">↓</span>
-				</span>
-					</template>
-				</th>
-				<th class="col-amount" @click="toggleSort('amount')">
-					<template x-if="sort.direction">
-					<span x-show="sort.column === 'amount'">
-				    <span x-show="sort.direction === 'asc'">↑</span>
-				    <span x-show="sort.direction === 'desc'">↓</span>
-				</span>
-					</template>
-					Amount
-				</th>
-			</tr>
-			</thead>
-			<tbody>
-			<template x-for="t in paginatedTransactions" :key="t.id">
-				<tr>
-					<td data-label="Date" x-html="(() => {
-					    const d = new Date(t.date);
-					    const day = String(d.getDate()).padStart(2,'0');
-					    const month = String(d.getMonth()+1).padStart(2,'0');
-					    const yearFull = d.getFullYear();
-					    const yearShort = String(yearFull).slice(-2); // last 2 digits
-					    const hours = String(d.getHours()).padStart(2,'0');
-					    const minutes = String(d.getMinutes()).padStart(2,'0');
-					    // Check screen width
-              const isMobile = window.innerWidth <= 1300;
-              return `${day}/${month}/${isMobile ? yearShort : yearFull}&nbsp;&nbsp;&nbsp;${hours}:${minutes}`;
-					})()"></td>
-					<td data-label="Description" x-text="t.description"></td>
-					<td class="col-category" data-label="Category">
-					<span class="col-type"
-					      :style="`color: ${t.category?.color || '#888'};`"
-					      x-text="t.category?.name || 'Uncategorized'">
-					</span>
-					</td>
-					<td data-label="Type" :class="t.is_income ? 'income' : 'expense'"
-					    x-text="t.is_income ? 'Income' : 'Expense'"></td>
-					<td data-label="Amount" colspan="" class="col-amount"
-					    x-text="parseFloat(t.amount).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2}) + '&nbsp;&nbsp;&nbsp;PLN'">
-					</td>
-				</tr>
-			</template>
-			</tbody>
-		</table>
+		{% include "app/components/dashboard/transaction_table.html" %}
 
-		<div class="transaction-footer">
-			<!-- Filters for desktop only -->
-			<div x-show="!$store.app.isMobile" x-cloak>
-				{% include "app/components/dashboard/transaction_filters.html" %}
-			</div>
-
-			<!-- Table Pagination -->
-			<div class="table-pagination" x-show="totalPages > 1" x-cloak>
-				<!-- Previous -->
-				<button class="outline" @click="goPrevPage" :disabled="currentPage === 1">&lt;</button>
-
-				<!-- Page buttons -->
-				<template x-for="(p, i) in visiblePages" :key="i">
-					<div>
-						<template x-if="p === '...'">
-							<span class="ellipsis">...</span>
-						</template>
-						<template x-if="p !== '...'">
-							<button
-								class="outline"
-								x-text="p"
-								@click="currentPage = p"
-								:disabled="p === currentPage"
-							></button>
-						</template>
-					</div>
-				</template>
-
-				<!-- Next -->
-				<button class="outline" @click="goNextPage" :disabled="currentPage === totalPages">&gt;</button>
-			</div>
-		</template>
-
-	</div>
-
-	<!-- Chart -->
-	<div x-data="chartApp()" style="max-width: 300px; margin: 2rem auto;">
-		<canvas id="summaryChart"></canvas>
+		<!-- Chart -->
+		<div x-data="chartApp()" style="max-width: 300px; margin: 2rem auto;">
+			<canvas id="summaryChart"></canvas>
+		</div>
 	</div>
 </div>
 

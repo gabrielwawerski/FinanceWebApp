@@ -49,14 +49,14 @@
 	{% block content %}{% endblock %}
 </main>
 
-<footer class="container">
+<footer class="container" x-cloak>
 	<p>&copy; 2025 Finance App</p>
 </footer>
 {% block extra_js %}
 {% endblock %}
 <!-- Load Alpine first -->
 <script src="{% static 'app/js/vendor/alpine.focus.min.js' %}" defer data-turbo-eval="false"></script>
-<script src="{% static 'app/js/vendor/alpine.min.js' %}" defer ></script>
+<script src="{% static 'app/js/vendor/alpine.min.js' %}" defer></script>
 
 <!-- Load components after Alpine -->
 <script src="{% static 'app/js/dashboard.js' %}"></script>
