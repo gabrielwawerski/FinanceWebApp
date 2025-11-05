@@ -2,9 +2,8 @@
         x-transition
         :open="showTransactionModal"
         @click.self="if (!isSubmitting) showTransactionModal = false"
-        @keydown.escape.window="if (!isSubmitting) showTransactionModal = false"
-        class="modal"
->
+        @keydown.escape.window="if (!isSubmitting && !$store.app.showCategoryModal) showTransactionModal = false"
+        class="modal">
 	<article class="modal-content">
 		<h3 style="padding: 0.5rem 0 0.5rem 0;">New Transaction</h3>
 		<form @submit.prevent="addTransaction" style="margin-bottom: 0;">
@@ -21,28 +20,36 @@
 			<fieldset>
 				<legend>Type</legend>
 				<label>
-					<input type="radio" name="type" x-model="isIncome" :value="true"
-					       @change="updateCategoriesForType('income')">
+					<input type="radio" name="type"
+					       x-model="$store.app.isIncome" :value="true"
+					       @change="setIncome">
 					Income
 				</label>
 				<label>
-					<input type="radio" name="type" x-model="isIncome" :value="false"
-					       @change="updateCategoriesForType('expense')">
+					<input type="radio" name="type"
+					       x-model="$store.app.isIncome" :value="false"
+					       @change="setExpense">
 					Expense
 				</label>
 			</fieldset>
 
 			<label>
 				Category
-				<div class="grid" style="grid-template-columns: 1fr auto; gap: .5rem;">
-					<select x-model="selectedCategoryId">
+				<div class="grid" style="grid-template-columns: 1fr 25%; gap: .5rem;">
+					<select
+							x-model.number="selectedCategoryId"
+							required
+							:style="`color: ${selectedCategoryColor}`"
+							@change="$refs.categoryDropdown.blur()"
+	x-ref="categoryDropdown"
+					>
 						<template x-for="c in filteredCategories" :key="c.id">
 							<option :value="c.id" :style="`color: ${c.color}`" x-text="c.name"></option>
 						</template>
 					</select>
 					<button type="button"
 					        class="secondary"
-					        @click="showCategoryModal = true">
+					        @click="$store.app.openCategoryModal()">
 						New
 					</button>
 				</div>
@@ -60,7 +67,7 @@
 
 				<button type="button"
 				        class="secondary"
-				        @click="if (!isSubmitting) showModal = false"
+				        @click="if (!isSubmitting) showTransactionModal = false"
 				        :disabled="isSubmitting"
 				        style="min-width: 25%;">
 					Cancel

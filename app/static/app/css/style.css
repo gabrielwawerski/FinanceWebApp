@@ -102,10 +102,6 @@ table .col-amount {
     /*font-weight: bold;*/
 }
 
-.table-fade {
-  transition: opacity 0.2s ease-in-out;
-}
-
 .table-pagination {
 	display: flex;
 	gap: 0.4rem;

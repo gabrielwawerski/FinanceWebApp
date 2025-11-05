@@ -10,7 +10,6 @@
 	<link rel="stylesheet" href="https://unpkg.com/@picocss/pico@latest/css/pico.min.css">
 	<link rel="stylesheet" href="{% static 'app/css/style.css' %}">
 
-	<script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
 	<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 	{% block extra_head %}{% endblock %}
@@ -52,29 +51,17 @@
 	<footer class="container">
 		<p>&copy; 2025 Finance App</p>
 	</footer>
-<script>
-	document.addEventListener('alpine:init', () => {
-    Alpine.store('app', {
-        transactions: window.initialTransactions || [],
-        categories: window.initialCategories || [],
-        currency: 'PLN',
-
-        addTransaction(transaction) {
-            this.transactions.unshift(transaction)
-        },
-
-        addCategory(category) {
-            this.categories.push(category)
-        },
-
-        // helper for filtered categories by type
-        filteredCategories(type) {
-            return this.categories.filter(c => c.type === type)
-        }
-    })
-})
-</script>
 	{% block extra_js %}
 	{% endblock %}
+	<!-- Load Alpine first -->
+<script src="{% static 'app/js/vendor/alpine.min.js' %}" defer data-turbo-eval="false"></script>
+
+<!-- Load your component scripts AFTER Alpine -->
+<script src="{% static 'app/js/dashboard.js' %}"></script>
+<script src="{% static 'app/js/components/category_component.js' %}"></script>
+<script src="{% static 'app/js/components/transaction_component.js' %}"></script>
+<script src="{% static 'app/js/components/chart_component.js' %}"></script>
+
+<!-- Start Alpine manually AFTER all components are loaded -->
 </body>
 </html>

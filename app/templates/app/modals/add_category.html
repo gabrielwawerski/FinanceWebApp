@@ -1,8 +1,9 @@
-<dialog x-show="showCategoryModal"
+<dialog x-data
+        x-show="$store.app.showCategoryModal"
         x-transition
-        :open="showCategoryModal"
-        @click.self="showCategoryModal = false"
-        @keydown.escape.window="showCategoryModal = false"
+        :open="$store.app.showCategoryModal"
+        @click.self="$store.app.closeCategoryModal()"
+        @keydown.escape.window="$store.app.closeCategoryModal()"
         class="modal">
 
 	<article class="modal-content">
@@ -33,7 +34,7 @@
 
 			<footer class="modal-actions">
 				<button type="submit">Save</button>
-				<button type="button" class="secondary" @click="showCategoryModal = false">Cancel</button>
+				<button type="button" class="secondary" @click="close()">Cancel</button>
 			</footer>
 		</form>
 	</article>
