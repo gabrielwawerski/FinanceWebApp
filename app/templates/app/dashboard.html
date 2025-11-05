@@ -9,7 +9,11 @@
 	<div x-data="transactionApp()">
 		{% include "app/modals/add_transaction.html" %}
 
-		<!-- Current Balance on the right -->
+		<div class="transactions-header">
+			<!-- Add Transaction Button -->
+			<button @click="showTransactionModal = true">Add Transaction</button>
+
+					<!-- Current Balance on the right -->
 		<div style="display:flex; flex-direction: column; align-items: flex-end;">
 			<div style="font-weight: bold;">
 				Balance
@@ -20,29 +24,6 @@
 				      x-text="balance.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2}) + '&nbsp;PLN'"></span>
 			</div>
 		</div>
-
-		<div class="transactions-header">
-			<!-- Add Transaction Button -->
-			<button @click="showTransactionModal = true">Add Transaction</button>
-
-			<!-- Filters -->
-<!--	TODO: bugs when category is selected and we swap the type		-->
-			<div class="transactions-filters">
-				<select x-model="filters.type" class="filter-input">
-					<option value="">All Types</option>
-					<option value="income">Income</option>
-					<option value="expense">Expense</option>
-				</select>
-
-				<select x-model="filters.category" class="filter-input">
-					<option value="">All Categories</option>
-					<template x-for="c in filteredCategoriesForFilter" :key="c.id">
-						<option :value="c.id" x-text="c.name" :style="`color: ${c.color}`"></option>
-					</template>
-				</select>
-
-				<input type="text" placeholder="Search description..." x-model="filters.description" class="filter-input">
-			</div>
 
 		</div>
 
@@ -121,6 +102,27 @@
 			</tbody>
 		</table>
 
+		<div style="display: flex; justify-content: space-between; align-items: center; margin-top: 1rem;">
+						<!-- Filters -->
+<!--	TODO: bugs when category is selected and we swap the type		-->
+			<div class="transactions-filters">
+				<select x-model="filters.type" class="filter-input">
+					<option value="">All Types</option>
+					<option value="income">Income</option>
+					<option value="expense">Expense</option>
+				</select>
+
+				<select x-model="filters.category" class="filter-input">
+					<option value="">All Categories</option>
+					<template x-for="c in filteredCategoriesForFilter" :key="c.id">
+						<option :value="c.id" x-text="c.name" :style="`color: ${c.color}`"></option>
+					</template>
+				</select>
+
+				<input type="text" placeholder="Search description..." x-model="filters.description" class="filter-input">
+			</div>
+
+
 		<!-- Table Pagination -->
 		<div class="table-pagination" x-show="totalPages > 1">
 			<!-- Previous -->
@@ -146,6 +148,7 @@
 			<!-- Next -->
 			<button class="outline" @click="goNextPage" :disabled="currentPage === totalPages">&gt;</button>
 		</div>
+			</div>
 
 	</div>
 

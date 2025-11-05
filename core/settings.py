@@ -24,7 +24,7 @@ SECRET_KEY = 'django-insecure-k7xqi9_wic3*wnh%)4+@kmdnj5f5q_@p$ehga+i-)%x1^kqsxy
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['masmix.pythonanywhere.com']
+ALLOWED_HOSTS = ['masmix.pythonanywhere.com', '127.0.0.1',]
 
 
 LOGIN_REDIRECT_URL = '/'

@@ -110,9 +110,9 @@ table .col-amount {
 }
 
 .table-pagination button {
-    padding: 0.25rem 0.5rem; /* smaller buttons */
+    /*padding: 0.25rem 0.5rem; !* smaller buttons *!*/
     min-width: 1.8rem; /* consistent size */
-    font-size: 0.8rem;
+    /*font-size: 0.8rem;*/
 }
 
 .table-pagination .ellipsis {
@@ -128,7 +128,7 @@ table .col-amount {
     display: flex;
     flex-direction: row;
     justify-content: space-between;
-    margin-top: 1rem;
+    /*margin-top: 1rem;*/
     margin-bottom: .5rem;
 }
 
@@ -136,6 +136,7 @@ table .col-amount {
     display: flex;
     flex-direction: row;
     max-width: fit-content;
+    align-items: center;
     gap: 0.5rem;
 }
 
