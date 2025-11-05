@@ -10,17 +10,22 @@
 		{% include "app/modals/add_transaction.html" %}
 
 		<div class="transactions-header">
+						<!-- Filters for mobile only -->
+    <div x-show="$store.app.isMobile">
+        {% include "app/components/dashboard/transaction_filters.html" %}
+    </div>
+
 			<!-- Add Transaction Button -->
 			<button class="add-transaction-button" @click="showTransactionModal = true">Add Transaction</button>
 
 			<!-- Current Balance on the right -->
-			<div style="display:flex; flex-direction: column; align-items: flex-end;">
-				<div style="font-weight: bold;">
+			<div class="balance-container">
+				<div class="balance-title" style="font-weight: bold;">
 					Balance
 				</div>
 				<div
 					:style="`color: ${balance < 0 ? '#e74c3c' : '#2ecc71'}`">
-				<span style="font-weight: bold; font-size: 1.2rem;"
+				<span class="balance-value"
 				      x-text="balance.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2}) + '&nbsp;PLN'"></span>
 				</div>
 			</div>
@@ -108,7 +113,10 @@
 		</table>
 
 		<div class="transaction-footer">
-			{% include "app/components/dashboard/transaction_filters.html" %}
+    <!-- Filters for desktop only -->
+    <div x-show="!$store.app.isMobile">
+        {% include "app/components/dashboard/transaction_filters.html" %}
+    </div>
 
 			<!-- Table Pagination -->
 			<div class="table-pagination" x-show="totalPages > 1">
