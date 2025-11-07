@@ -2,35 +2,39 @@
 
 {% load static %}
 
+{% block extra_head %}
+<link rel="stylesheet" href="{% static 'app/css/dashboard/transaction_app.css' %}">
+{% endblock %}
+
 {% block title %}Dashboard{% endblock %}
 
 {% block content %}
-<div>
-	<div x-data="transactionApp()">
+<section class="section">
+	<div x-data="transactionApp()" class="container">
 		{% include "app/modals/add_transaction.html" %}
 
 		<div class="transactions-header">
-			<!-- Filters for mobile only -->
 			<template x-if="$store.app.isMobile" x-cloak>
 				{% include "app/components/dashboard/transaction_filters.html" %}
 			</template>
 
-			<!-- Add Transaction Button -->
-			<button class="add-transaction-button" @click="showTransactionModal = true">Add Transaction</button>
+			<!-- Left: Add Transaction -->
+			<button class="button is-primary is-medium" @click="showTransactionModal = true">Add Transaction</button>
 
-			<!-- Current Balance on the right -->
+			<!-- Right: Balance -->
 			<div class="balance-container">
-				<div class="balance-title" style="font-weight: bold;">
+				<div class="balance-title has-text-weight-bold">
 					Balance
 				</div>
-				<div
-					:style="`color: ${balance < 0 ? '#e74c3c' : '#2ecc71'}`">
-				<span class="balance-value"
-				      x-text="balance.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2}) + '&nbsp;PLN'"></span>
+				<div :style="`color: ${balance < 0 ? '#e74c3c' : '#2ecc71'}`">
+			<span class="balance-value is-size-4"
+			      x-text="balance.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2}) + '&nbsp;PLN'"></span>
 				</div>
 			</div>
-
 		</div>
+
+<!--		<hr style="margin-top: .6rem !important; margin-bottom: 0 !important;">-->
+
 
 		{% include "app/components/dashboard/transaction_table.html" %}
 
@@ -39,7 +43,7 @@
 			<canvas id="summaryChart"></canvas>
 		</div>
 	</div>
-</div>
+</section>
 
 {% endblock %}
 

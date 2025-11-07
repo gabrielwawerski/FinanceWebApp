@@ -6,7 +6,7 @@ function transactionApp() {
         showTransactionModal: false,
         isSubmitting: false,
         currentPage: 1,
-        pageSize: 10,
+        pageSize: 5,
 
         filteredCategories: [],
 

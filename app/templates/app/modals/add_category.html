@@ -7,9 +7,12 @@
         class="modal">
 
 	<article class="modal-content">
-		<h3 style="padding: 0.5rem 0 0.5rem 0;">New Category</h3>
+		<header>
+			<button class="close-button" aria-label="Close" rel="prev" @click="close()"></button>
+			<p style="padding: 0.5rem 0 0.5rem 0;font-weight: bold">New Category</p>
+		</header>
 
-		<form @submit.prevent="addCategory" style="margin-bottom: 0;">
+		<form id="category-form" @submit.prevent="addCategory" style="margin-bottom: 0;">
 			<label>
 				Name
 				<input type="text" x-model="categoryName" required>
@@ -31,11 +34,10 @@
 					Expense
 				</label>
 			</fieldset>
-
-			<footer class="modal-actions">
-				<button type="submit" style="max-width: 25%;">Save</button>
-				<button type="button" style="min-width: 25%;" class="secondary" @click="close()">Cancel</button>
-			</footer>
 		</form>
+		<footer class="modal-actions">
+				<button type="submit" form="category-form" style="max-width: 25%;">Save</button>
+				<button type="button" form="category-form" style="min-width: 25%;" class="secondary" @click="close()">Cancel</button>
+			</footer>
 	</article>
 </dialog>

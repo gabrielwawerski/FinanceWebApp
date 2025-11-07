@@ -1,5 +1,7 @@
 document.addEventListener('alpine:init', () => {
     Alpine.store('app', {
+        isDarkTheme: Alpine.$persist(true).as('isDarkTheme'),
+
         transactions: window.initialTransactions,
         categories: window.initialCategories,
 
@@ -8,7 +10,7 @@ document.addEventListener('alpine:init', () => {
             this.isIncome = income;
         },
 
-        mobileBreakpoint: 800,
+        mobileBreakpoint: 767,
         isMobile: window.innerWidth <= this.mobileBreakpoint,
 
         showCategoryModal: false,

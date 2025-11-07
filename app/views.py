@@ -1,9 +1,10 @@
-from django.contrib.auth import login
+from django.contrib.auth import login, logout
 from django.contrib.auth.decorators import login_required
 from django.db import models
 from django.shortcuts import render, redirect
 import json
 
+from django.views.decorators.http import require_POST
 from rest_framework import viewsets, permissions
 
 from app.forms import RegisterForm
@@ -63,10 +64,10 @@ def dashboard_view(request):
 			"is_income": t.is_income,
 			"date": t.date.isoformat(),
 			"category": {
-        	    "id": t.category.id if t.category else None,
-        	    "name": t.category.name if t.category else "Uncategorized",
-        	    "color": t.category.color if t.category else "#bdc3c7",
-        	}
+				"id": t.category.id if t.category else None,
+				"name": t.category.name if t.category else "Uncategorized",
+				"color": t.category.color if t.category else "#bdc3c7",
+			}
 		}
 		for t in transactions
 	]
@@ -103,3 +104,9 @@ def register_view(request):
 	else:
 		form = RegisterForm()
 	return render(request, "app/register.html", {"form": form})
+
+
+@require_POST  # ensures only POST requests can trigger logout
+def logout_view(request):
+	logout(request)  # securely logs out the user
+	return redirect('login')  # redirect after logout

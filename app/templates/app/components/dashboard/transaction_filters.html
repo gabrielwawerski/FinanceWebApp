@@ -1,17 +1,69 @@
 <!--	TODO: bugs when category is selected and we swap the type		-->
-<div class="transactions-filters">
-	<select x-model="filters.type" class="filter-input">
-		<option value="">All Types</option>
-		<option value="income">Income</option>
-		<option value="expense">Expense</option>
-	</select>
+<div class="transactions-filters"
+>
+	<div
+		x-data="{ isOpen: false }"
+		@click.away="isOpen = false"
+		class="dropdown"
+		:class="{ 'is-active': isOpen }">
+		<div class="dropdown-trigger">
+			<button class="button" aria-haspopup="true" aria-controls="type-dropdown" @click="isOpen = !isOpen">
+				<span x-text="filters.type.charAt(0).toUpperCase() + filters.type.slice(1) || 'All Types'"></span>
+				<span class="icon is-small">
+				<i class="fas fa-angle-down" aria-hidden="true"></i>
+			</span>
+			</button>
+		</div>
 
-	<select x-model="filters.category" class="filter-input">
-		<option value="">All Categories</option>
-		<template x-for="c in filteredCategoriesForFilter" :key="c.id">
-			<option :value="c.id" x-text="c.name" :style="`color: ${c.color}`"></option>
-		</template>
-	</select>
+		<div class="dropdown-menu" id="type-dropdown" role="menu">
+			<div class="dropdown-content">
+				<a :class="{ 'is-active': filters.type === '' }" class="dropdown-item has-text-weight-medium" href="#"
+				   @click.prevent="filters.type = ''; isOpen = false">All Types</a>
+				<a :class="{ 'is-active': filters.type === 'income' }" class="dropdown-item has-text-weight-medium" href="#"
+				   @click.prevent="filters.type = 'income'; isOpen = false">Income</a>
+				<a :class="{ 'is-active': filters.type === 'expense' }" class="dropdown-item has-text-weight-medium" href="#"
+				   @click.prevent="filters.type = 'expense'; isOpen = false">Expense</a>
+			</div>
+		</div>
+	</div>
 
-	<input type="text" placeholder="Search description..." x-model="filters.description" class="filter-input">
+	<div x-data="{ isOpen: false }" class="dropdown" :class="{ 'is-active': isOpen }" @click.away="isOpen = false">
+		<div class="dropdown-trigger">
+			<button class="button" aria-haspopup="true" aria-controls="category-dropdown" @click="isOpen = !isOpen">
+			<span :color="`color: ${selectedCategoryColor}`"
+				x-text="
+				filters.category
+					? filteredCategoriesForFilter.find(c => c.id == filters.category)?.name
+					: 'All Categories'
+			"></span>
+				<span class="icon is-small">
+				<i class="fas fa-angle-down" aria-hidden="true"></i>
+			</span>
+			</button>
+		</div>
+
+		<div class="dropdown-menu" id="category-dropdown" role="menu">
+			<div class="dropdown-content">
+				<!-- All Categories -->
+				<a href="#" class="dropdown-item has-text-weight-medium" :class="{ 'is-active': filters.category === '' }"
+				   @click.prevent="filters.category = ''; isOpen = false">
+					All Categories
+				</a>
+
+				<!-- Dynamic categories -->
+				<template x-for="c in filteredCategoriesForFilter" :key="c.id">
+					<a href="#" class="dropdown-item has-text-weight-medium"
+					   :class="{ 'is-active': filters.category == c.id }"
+					   @click.prevent="filters.category = c.id; isOpen = false"
+					   :style="`color: ${c.color}`"
+					   x-text="c.name">
+					</a>
+				</template>
+			</div>
+		</div>
+	</div>
+
+
+	<input type="text" placeholder="Search description..." x-model="filters.description"
+	       class="filter-input input is-rounded" style="margin-left: .5rem;">
 </div>

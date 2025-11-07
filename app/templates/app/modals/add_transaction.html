@@ -1,85 +1,125 @@
-<dialog x-show="showTransactionModal"
-        x-transition
-        :open="showTransactionModal"
-        x-trap.noscroll="showTransactionModal"
-        @click.self="if (!isSubmitting) showTransactionModal = false"
-        @keydown.escape.window="if (!isSubmitting && !$store.app.showCategoryModal) showTransactionModal = false"
-        class="modal">
-	<article class="modal-content">
-		<h3 style="padding: 0.5rem 0 0.5rem 0;">New Transaction</h3>
-		<form @submit.prevent="addTransaction" style="margin-bottom: 0;">
-			<label>
-				Amount
-				<input type="number" x-model="transactionAmount" step="1" required>
-			</label>
+<!-- Transaction Modal -->
+<div class="modal"
+     x-show="showTransactionModal"
+     x-transition
+     :class="{ 'is-active': showTransactionModal }"
+     x-trap.noscroll="showTransactionModal"
+     @keydown.escape.window="if (!isSubmitting && !$store.app.showCategoryModal) showTransactionModal = false">
 
-			<label>
-				Description
-				<input type="text" x-model="transactionDescription" required>
-			</label>
+	<div class="modal-background"></div>
 
-			<fieldset style="display:flex; flex-direction: row; width: 100%; align-items: center; justify-content: center;">
-				<legend>Type</legend>
-				<label>
-					<input type="radio" name="type"
-					       x-model="$store.app.isIncome" :value="true"
-					       @change="setIncome">
-					Income
-				</label>
-				<label>
-					<input type="radio" name="type"
-					       x-model="$store.app.isIncome" :value="false"
-					       @change="setExpense">
-					Expense
-				</label>
-			</fieldset>
+	<div class="modal-card" @click.away="if (!isSubmitting && !$store.app.showCategoryModal) showTransactionModal = false">
+		<header class="modal-card-head">
+			<p class="modal-card-title">New Transaction</p>
+			<button class="delete"
+			        aria-label="close"
+			        @click="if (!isSubmitting) showTransactionModal = false"
+			        :disabled="isSubmitting"></button>
+		</header>
 
-			<label>
-				Category
-				<div class="grid" style="grid-template-columns: 1fr 25%; gap: .5rem;">
-					<select
-							x-model.number="selectedCategoryId"
-							required
-							:style="`color: ${selectedCategoryColor}`"
-							@change="$refs.categoryDropdown.blur()"
-	x-ref="categoryDropdown"
-					>
-						<template x-for="c in filteredCategories" :key="c.id">
-							<option :value="c.id" :style="`color: ${c.color}`" x-text="c.name"></option>
-						</template>
-					</select>
-					<button type="button"
-					        class="secondary"
-					        @click="$store.app.openCategoryModal()">
-						New
-					</button>
+		<section class="modal-card-body">
+			<form @submit.prevent="addTransaction">
+				<!-- Amount -->
+				<div class="field">
+					<label class="label">Amount</label>
+					<div class="control">
+						<input class="input"
+						       type="number"
+						       step="1"
+						       x-model="transactionAmount"
+						       placeholder="0.00"
+						       required>
+					</div>
 				</div>
-			</label>
 
+				<!-- Description -->
+				<div class="field">
+					<label class="label">Description</label>
+					<div class="control">
+						<input class="input"
+						       type="text"
+						       x-model="transactionDescription"
+						       placeholder="e.g., Grocery shopping"
+						       required>
+					</div>
+				</div>
 
-			<footer class="modal-actions">
-				<button type="submit"
-				        :aria-busy="isSubmitting"
-				        :disabled="isSubmitting"
-				        style="max-width: 25%;">
-					<span x-show="!isSubmitting">
-						Save
-					</span>
-					<span x-show="isSubmitting"></span>
-				</button>
+				<div class="field-category">
+					<div class="field-body">
+						<!-- Type: Income / Expense -->
+						<div class="field">
+							<label class="label">Type</label>
+							<div class="control">
+								<div class="buttons has-addons">
+									<button type="button"
+									        class="button"
+									        :class="{ 'is-success is-selected': $store.app.isIncome }"
+									        @click="$store.app.isIncome = true; setIncome()">
+										<span>Income</span>
+									</button>
+									<button type="button"
+									        class="button"
+									        :class="{ 'is-danger is-selected': !$store.app.isIncome }"
+									        @click="$store.app.isIncome = false; setExpense()">
+										<span>Expense</span>
+									</button>
+								</div>
+							</div>
+						</div>
 
-				<button type="button"
-				        class="secondary"
-				        @click="if (!isSubmitting) showTransactionModal = false"
-				        :disabled="isSubmitting"
-				        style="min-width: 25%;">
-					Cancel
-				</button>
-			</footer>
-		</form>
-	</article>
-</dialog>
+						<!-- Category -->
+						<div class="field">
+							<label class="label">Category</label>
+							<div class="field has-addons">
+								<div class="control is-expanded">
+									<div class="select is-fullwidth">
+										<select x-model.number="selectedCategoryId"
+										        required
+										        :style="`color: ${selectedCategoryColor}`"
+										        @change="$refs.categoryDropdown?.blur()"
+										        x-ref="categoryDropdown">
+											<template x-for="c in filteredCategories" :key="c.id">
+												<option :value="c.id"
+												        :style="`color: ${c.color}`"
+												        x-text="c.name">
+												</option>
+											</template>
+										</select>
+									</div>
+								</div>
+								<div class="control">
+									<button type="button"
+									        class="button is-info"
+									        @click="$store.app.openCategoryModal()">
+										New
+									</button>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</form>
+		</section>
 
+		<footer class="modal-card-foot" style="justify-content: flex-end;">
+			<button class="button is-success"
+			        type="submit"
+			        @click="addTransaction"
+			        :aria-busy="isSubmitting"
+			        :disabled="isSubmitting">
+				<span x-show="!isSubmitting">Save</span>
+				<span x-show="isSubmitting" class="loader"></span>
+			</button>
+			<button class="button"
+			        @click="if (!isSubmitting) showTransactionModal = false"
+			        :disabled="isSubmitting">
+				Cancel
+			</button>
+		</footer>
+	</div>
+</div>
+
+<!-- Category Modal (unchanged, just kept as wrapper) -->
 <div x-data="categoryApp()">
 	{% include "app/modals/add_category.html" %}
 </div>
