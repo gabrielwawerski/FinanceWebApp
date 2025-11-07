@@ -126,13 +126,13 @@
 <nav class="pagination" role="navigation" aria-label="pagination" x-show="totalPages > 1">
     <!-- Previous button -->
     <a href="#"
-       class="pagination-previous"
+       class="pagination-previous is-outlined"
        @click.prevent="goPrevPage"
        :disabled="currentPage === 1">&lt;</a>
 
     <!-- Next button -->
     <a href="#"
-       class="pagination-next"
+       class="pagination-next is-outlined"
        @click.prevent="goNextPage"
        :disabled="currentPage === totalPages">&gt;</a>
 
@@ -145,7 +145,7 @@
                 </template>
                 <template x-if="p !== '...'">
                     <a href="#"
-                       class="pagination-link"
+                       class="pagination-link is-outlined"
                        :class="{'is-current': p === currentPage}"
                        x-text="p"
                        @click.prevent="currentPage = p"></a>
