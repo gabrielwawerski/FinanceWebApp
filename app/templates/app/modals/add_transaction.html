@@ -1,19 +1,20 @@
 <!-- Transaction Modal -->
-<div class="modal"
-     x-show="showTransactionModal"
+<div x-data="transactionModalApp()"
+	class="modal"
+     x-show="$store.app.showTransactionModal"
      x-transition
-     :class="{ 'is-active': showTransactionModal }"
-     x-trap.noscroll="showTransactionModal"
-     @keydown.escape.window="if (!isSubmitting && !$store.app.showCategoryModal) showTransactionModal = false">
+     :class="{ 'is-active': $store.app.showTransactionModal }"
+     x-trap.noscroll="$store.app.showTransactionModal"
+     @keydown.escape.window="if (!isSubmitting && !$store.app.showCategoryModal) $store.app.closeTransactionModal()">
 
 	<div class="modal-background"></div>
 
-	<div class="modal-card" @click.away="if (!isSubmitting && !$store.app.showCategoryModal) showTransactionModal = false">
+	<div class="modal-card" @click.away="if (!isSubmitting && !$store.app.showCategoryModal) $store.app.closeTransactionModal()">
 		<header class="modal-card-head">
 			<p class="modal-card-title">New Transaction</p>
 			<button class="delete"
 			        aria-label="close"
-			        @click="if (!isSubmitting) showTransactionModal = false"
+			        @click="if (!isSubmitting) $store.app.closeTransactionModal()"
 			        :disabled="isSubmitting"></button>
 		</header>
 
@@ -54,13 +55,13 @@
 									<button type="button"
 									        class="button"
 									        :class="{ 'is-success is-selected': $store.app.isIncome }"
-									        @click="$store.app.isIncome = true; setIncome()">
+									        @click="$store.app.isIncome = true; $store.app.setIncome()">
 										<span>Income</span>
 									</button>
 									<button type="button"
 									        class="button"
 									        :class="{ 'is-danger is-selected': !$store.app.isIncome }"
-									        @click="$store.app.isIncome = false; setExpense()">
+									        @click="$store.app.isIncome = false; $store.app.setExpense()">
 										<span>Expense</span>
 									</button>
 								</div>
@@ -111,7 +112,7 @@
 				<span x-show="isSubmitting" class="loader"></span>
 			</button>
 			<button class="button"
-			        @click="if (!isSubmitting) showTransactionModal = false"
+			        @click="if (!isSubmitting) $store.app.closeTransactionModal()"
 			        :disabled="isSubmitting">
 				Cancel
 			</button>

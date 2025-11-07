@@ -2,10 +2,6 @@
 .transactions-table {
     table-layout: fixed;
 	width: 100%;
-	user-select: none;
-	-webkit-user-select: none;
-	-moz-user-select: none;
-	-ms-user-select: none;
 	margin-bottom: 0 !important;
 }
 
@@ -36,18 +32,11 @@
 .transactions-table .col-type { width: 10%; }
 .transactions-table .col-amount { width: 15%; text-align: right !important; }
 
-.income { color: #2ecc71; }
-.expense { color: #e74c3c; }
-
 .table-pagination {
 	display: flex;
 	gap: 0.4rem;
 	align-items: center;
 	justify-content: flex-end;
-}
-
-.table-pagination button {
-	min-width: 1.8rem;
 }
 
 .table-pagination .ellipsis {
@@ -66,6 +55,13 @@
     align-items: center;
 }
 
+.transaction-table-header {
+		user-select: none;
+	-webkit-user-select: none;
+	-moz-user-select: none;
+	-ms-user-select: none;
+}
+
 .transactions-filters {
 	/*display: flex;*/
 	/*flex-direction: row;*/
@@ -82,7 +78,7 @@
 	flex-direction: row;
 	justify-content: space-between;
 	align-items: center;
-	margin-top: 1rem;
+	/*margin-top: 1rem;*/
 }
 
 .balance-container {

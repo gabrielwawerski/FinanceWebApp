@@ -9,9 +9,9 @@
 {% block title %}Dashboard{% endblock %}
 
 {% block content %}
+{% include "app/modals/add_transaction.html" %}
 <section class="section">
 	<div x-data="transactionApp()" class="container">
-		{% include "app/modals/add_transaction.html" %}
 
 		<div class="transactions-header">
 			<template x-if="$store.app.isMobile" x-cloak>
@@ -19,7 +19,7 @@
 			</template>
 
 			<!-- Left: Add Transaction -->
-			<button class="button is-primary is-medium" @click="showTransactionModal = true">Add Transaction</button>
+			<button class="button is-primary is-normal" @click="$store.app.openTransactionModal()">Add Transaction</button>
 
 			<!-- Right: Balance -->
 			<div class="balance-container">

@@ -18,6 +18,18 @@
 	--bulma-info-s: 70%;
 	--bulma-info-l: 50%;
 	--bulma-scheme-h: 210;
+	--income-color: #2ecc71;
+	--expense-color: #e74c3c;
+}
+
+.income { color: #2ecc71 !important; }
+.expense { color: #e74c3c !important; }
+
+.navbar-item {
+	user-select: none;
+	-webkit-user-select: none;
+	-moz-user-select: none;
+	-ms-user-select: none;
 }
 
 /* Buttons */
@@ -50,44 +62,7 @@
 	color: white;
 }
 
-/* Fieldset styles */
-fieldset legend {
-	font-weight: 600;
-	margin-bottom: 0.5rem;
-}
-
-fieldset label {
-	margin-right: 1rem;
-	display: inline-flex;
-	align-items: center;
-	gap: 0.3rem;
-}
-
-/* Pagination */
-div.pagination button[disabled] {
-	font-weight: bold;
-	background-color: #eee;
-	cursor: default;
-}
-
-
 /* Modal */
-.modal-content { max-width: 350px; }
-
-.modal-actions {
-	display: flex;
-	flex-direction: row;
-	align-items: center;
-	justify-content: flex-end;
-	padding: 1rem 1rem;
+.modal-card {
+	margin: 0 !important;
 }
-
-.modal-actions button { margin-bottom: 0; }
-
-.close-button {
-	user-select: none;
-}
-
-.close-button:focus { outline: none; }
-
-

@@ -13,12 +13,29 @@ document.addEventListener('alpine:init', () => {
         mobileBreakpoint: 767,
         isMobile: window.innerWidth <= this.mobileBreakpoint,
 
+        showTransactionModal: false,
+
+        openTransactionModal() {
+            this.showTransactionModal = true;
+        },
+
+        closeTransactionModal() {
+            this.showTransactionModal = false;
+        },
+
         showCategoryModal: false,
         openCategoryModal() {
             this.showCategoryModal = true;
         },
         closeCategoryModal() {
             this.showCategoryModal = false;
+        },
+
+                setIncome() {
+            this.setType(true);
+        },
+        setExpense() {
+            this.setType(false);
         },
 
         init() {

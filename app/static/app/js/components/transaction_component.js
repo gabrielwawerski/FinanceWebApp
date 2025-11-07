@@ -3,10 +3,9 @@ function transactionApp() {
         transactionDescription: '',
         transactionAmount: '',
         selectedCategoryId: null,
-        showTransactionModal: false,
         isSubmitting: false,
         currentPage: 1,
-        pageSize: 5,
+        pageSize: 2,
 
         filteredCategories: [],
 
@@ -22,25 +21,15 @@ function transactionApp() {
         },
 
         init() {
-            this.updateFilteredCategories();
-
-            // Whenever type changes, update filtered categories
-            this.$watch('$store.app.isIncome', () => {
-                this.updateFilteredCategories();
-            });
-
-            this.$watch('selectedCategoryId', () => {
-                console.log('Category changed to', this.selectedCategoryId);
-            });
-
-            // Listen for new category
-            document.addEventListener('category-added', e => {
-                this.updateFilteredCategories(e.detail);
-            });
-
             this.$watch('filters', () => {
                 this.currentPage = 1;
             }, {deep: true});
+        },
+
+        get selectedCategoryColor() {
+            if (!this.filters.category) return '#000';
+            const cat = this.filteredCategoriesForFilter.find(c => c.id == this.filters.category);
+            return cat ? cat.color : '#000';
         },
 
         get filteredCategoriesForFilter() {
@@ -120,58 +109,6 @@ function transactionApp() {
         get selectedCategoryColor() {
             const cat = this.filteredCategories.find(c => c.id == this.selectedCategoryId); // note == instead of ===
             return cat ? cat.color : '#000';
-        },
-
-        updateFilteredCategories(newCategoryId = null) {
-            const type = this.$store.app.isIncome ? 'income' : 'expense';
-            this.filteredCategories = this.$store.app.categories.filter(c => c.type === type);
-
-            // select newly added category if provided, otherwise keep current or default
-            if (newCategoryId) {
-                this.selectedCategoryId = newCategoryId;
-            } else if (!this.filteredCategories.find(c => c.id === this.selectedCategoryId)) {
-                this.selectedCategoryId = this.filteredCategories.length ? this.filteredCategories[0].id : null;
-            }
-        },
-
-        setIncome() {
-            this.$store.app.setType(true);
-        },
-        setExpense() {
-            this.$store.app.setType(false);
-        },
-
-        async addTransaction() {
-            this.isSubmitting = true;
-            try {
-                const res = await fetch(window.transactionsApiUrl, {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                        "X-CSRFToken": window.csrf_token
-                    },
-                    body: JSON.stringify({
-                        description: this.transactionDescription,
-                        amount: this.transactionAmount,
-                        is_income: this.$store.app.isIncome,
-                        category: this.selectedCategoryId
-                    })
-                });
-                if (!res.ok) throw new Error("Failed to save transaction");
-                const data = await res.json();
-                this.$store.app.addTransaction(data);
-
-                // Reset form
-                this.transactionDescription = '';
-                this.transactionAmount = '';
-                this.$store.app.isIncome = false; // default to expense
-                this.updateFilteredCategories(); // update dropdown
-                this.showTransactionModal = false;
-            } catch (e) {
-                console.error(e);
-            } finally {
-                this.isSubmitting = false;
-            }
         },
 
         get visiblePages() {
