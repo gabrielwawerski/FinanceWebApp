@@ -1,263 +1,306 @@
 /*********** TABLE ***********/
 .transactions-table {
     table-layout: fixed;
-	width: 100%;
-	margin-bottom: 0 !important;
+    width: 100%;
+    margin-bottom: 0 !important;
 }
 
 .transactions-table tbody {
-	min-height: 190px; /* or whatever max table height is */
-	display: block;      /* needed if you want scrolling inside tbody */
+    min-height: 190px;
+    display: block;
 }
 
 .transactions-table thead,
 .transactions-table tbody tr {
-	display: table;      /* keep table layout */
-	width: 100%;
-	table-layout: fixed;
+    display: table;
+    width: 100%;
+    table-layout: fixed;
 }
 
-.transactions-table th { cursor: pointer; }
+.transactions-table th {
+    cursor: pointer;
+}
 
 .transactions-table th,
 .transactions-table td {
-	overflow: hidden;
-	text-overflow: ellipsis;
-	white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
-.transactions-table .col-date { width: 15%; }
-.transactions-table .col-description { width: 50%; text-align: left !important;;word-break: break-word; }
-.transactions-table .col-category { width: 15%; text-align: right !important; }
-.transactions-table .col-type { width: 10%; }
-.transactions-table .col-amount { width: 15%; text-align: right !important; }
+.transactions-table .col-date {
+    width: 15%;
+}
 
+.transactions-table .col-description {
+    width: 50%;
+    text-align: left !important;
+    word-break: break-word;
+}
+
+.transactions-table .col-category {
+    width: 15%;
+    text-align: right !important;
+}
+
+.transactions-table .col-type {
+    width: 10%;
+}
+
+.transactions-table .col-amount {
+    width: 15%;
+    text-align: right !important;
+}
+
+/* Pagination */
 .table-pagination {
-	display: flex;
-	gap: 0.4rem;
-	align-items: center;
-	justify-content: flex-end;
+    display: flex;
+    gap: 0.4rem;
+    align-items: center;
+    justify-content: flex-end;
 }
 
 .table-pagination .ellipsis {
-	color: #999;
-	font-weight: bold;
-	user-select: none;
-	display: inline-block;
-	vertical-align: bottom;
-	padding: 0 0.4rem;
+    color: #999;
+    font-weight: bold;
+    user-select: none;
+    display: inline-block;
+    vertical-align: bottom;
+    padding: 0 0.4rem;
 }
 
-/* Transactions header & filters */
+/* Header & Filters */
 .transactions-header {
-	display: flex;
-	justify-content: space-between;
+    display: flex;
+    justify-content: space-between;
     align-items: center;
 }
 
 .transaction-table-header {
-		user-select: none;
-	-webkit-user-select: none;
-	-moz-user-select: none;
-	-ms-user-select: none;
+    user-select: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
 }
 
 .transactions-filters {
-	/*display: flex;*/
-	/*flex-direction: row;*/
-	/*max-width: fit-content;*/
-	/*align-items: center;*/
-	/*gap: 0.5rem;*/
+    /* Placeholder for filters; uncomment and adjust as needed */
+    /* display: flex; */
+    /* flex-direction: row; */
+    /* max-width: fit-content; */
+    /* align-items: center; */
+    /* gap: 0.5rem; */
 }
 
-.filter-input { width: fit-content; }
+.filter-input {
+    width: fit-content;
+}
 
-/* Transaction footer and balance */
+/* Footer & Balance */
 .transaction-footer {
-	display: flex;
-	flex-direction: row;
-	justify-content: space-between;
-	align-items: center;
-	/*margin-top: 1rem;*/
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
 }
 
 .balance-container {
-	display: flex;
-	flex-direction: column;
-	align-items: flex-end;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
 }
 
 .balance-value {
-	font-weight: bold;
-	font-size: 1.2rem;
+    font-weight: bold;
+    font-size: 1.2rem;
 }
-
 
 /* Media Queries */
 @media screen and (max-width: 1100px) {
-	.transactions-table .col-date,
-	.transactions-table .col-description,
-	.transactions-table .col-category,
-	.transactions-table .col-type,
-	.transactions-table .col-amount {
-		width: auto;
-		text-align: left;
-	}
+    .transactions-table .col-date,
+    .transactions-table .col-description,
+    .transactions-table .col-category,
+    .transactions-table .col-type,
+    .transactions-table .col-amount {
+        width: auto;
+        text-align: left;
+    }
 
-	.transactions-table .col-amount { width: 20%; text-align: right; }
-	.transactions-table .col-type { width: 15%; }
-	.transactions-table .col-category { text-align: end; }
+    .transactions-table .col-amount {
+        width: 20%;
+        text-align: right;
+    }
+
+    .transactions-table .col-type {
+        width: 15%;
+    }
+
+    .transactions-table .col-category {
+        text-align: end;
+    }
 }
 
 @media screen and (max-width: 767px) {
-	.section { padding: 3rem 0.7rem !important; }
+	/*.section { padding: 3rem 0.7rem !important; }*/
 
 	/* Section padding */
 	.section {
 		padding: var(--section-padding) 1.5rem;
 	}
 
-	.transactions-table .col-date,
-	.transactions-table .col-description,
-	.transactions-table .col-category,
-	.transactions-table .col-type,
-	.transactions-table .col-amount {
-		width: auto;
-		text-align: left;
-	}
+    .transactions-table .col-date,
+    .transactions-table .col-description,
+    .transactions-table .col-category,
+    .transactions-table .col-type,
+    .transactions-table .col-amount {
+        width: auto;
+        text-align: left;
+    }
 
-	.transactions-table .col-amount { text-align: right; }
-	.transactions-table .col-description { word-break: normal; }
+    .transactions-table .col-amount {
+        text-align: right;
+    }
 
-	.modal { align-items: flex-start; }
-	.modal-content { max-width: 100%; }
+    .transactions-table .col-description {
+        word-break: normal;
+    }
 
-	.balance-container {
-		display: flex;
-		flex-direction: column;
-		justify-content: space-between;
-		align-items: center;
-		font-size: 1.5rem;
-		padding-bottom: 1rem;
-	}
+    .modal-content {
+        max-width: 100%;
+    }
 
-	.transactions-header {
-		flex-direction: column-reverse;
-		gap: 1rem;
-	}
+    .balance-container {
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        align-items: center;
+        font-size: 1.5rem;
+        padding-bottom: 1rem;
+    }
 
-	.add-transaction-button { margin-bottom: 1rem; }
+    .transactions-header {
+        flex-direction: column-reverse;
+        gap: 1rem;
+    }
 
-	.transaction-footer {
-		flex-direction: column-reverse;
-		justify-content: center;
-		gap: 1rem;
-	}
+    .add-transaction-button {
+        margin-bottom: 1rem;
+    }
 
-	.transactions-filters {
-		flex-direction: column;
-		align-items: center;
-		gap: 1rem;
-		min-width: 100%;
-		justify-content: center;
-	}
+    .transaction-footer {
+        flex-direction: column-reverse;
+        justify-content: center;
+        gap: 1rem;
+    }
 
-	.filter-input { width: 100%; }
+    .transactions-filters {
+        flex-direction: column;
+        align-items: center;
+        gap: 1rem;
+        min-width: 100%;
+        justify-content: center;
+    }
 
-	.transactions-table thead,
-	.transactions-table tbody,
-	.transactions-table th,
-	.transactions-table td,
-	.transactions-table tr {
-		display: block;
-	}
+    .filter-input {
+        width: 100%;
+    }
 
-	.transactions-table thead tr { display: none; }
+    /* Table to block layout for mobile */
+    .transactions-table thead,
+    .transactions-table tbody,
+    .transactions-table th,
+    .transactions-table td,
+    .transactions-table tr {
+        display: block;
+    }
 
-	.transactions-table tr {
-		margin-bottom: 1rem;
-		border-bottom: 1px solid #ccc;
-	}
+    .transactions-table thead tr {
+        display: none;
+    }
 
-	.transactions-table td {
-		display: flex;
-		justify-content: space-between;
-		padding: 0.5rem 0;
-		font-weight: bold;
-	}
+    .transactions-table tr {
+        margin-bottom: 1rem;
+        border-bottom: 1px solid #ccc;
+    }
 
-	.transactions-table td::before {
-		content: attr(data-label);
-		font-weight: bold;
-	}
+    .transactions-table td {
+        display: flex;
+        justify-content: space-between;
+        padding: 0.5rem 0;
+        font-weight: bold;
+    }
 
-	/* --- New mobile card layout --- */
+    .transactions-table td::before {
+        content: attr(data-label);
+        font-weight: bold;
+    }
 
-	.transactions-cards {
-		display: flex;
-		flex-direction: column;
-		gap: 0.75rem;
-	}
+    /* Alternative mobile card layout */
+    .transactions-cards {
+        display: flex;
+        flex-direction: column;
+        gap: 0.75rem;
+    }
 
-	.transaction-card {
-		border-radius: 0.75rem;
-		padding: 0.9rem 1rem;
-		box-shadow: 0 1px 4px rgba(0,0,0,0.15);
-		display: flex;
-		flex-direction: column;
-		gap: 0.5rem;
-	}
+    .transaction-card {
+        border-radius: 0.75rem;
+        padding: 0.9rem 1rem;
+        box-shadow: 0 1px 4px rgba(0, 0, 0, 0.15);
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+    }
 
-	.transaction-card .top-row {
-		display: flex;
-		justify-content: space-between;
-		align-items: flex-start;
-	}
+    .transaction-card .top-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+    }
 
-	.amount-group {
-		display: flex;
-		flex-direction: column;
-		gap: 0.2rem;
-	}
+    .amount-group {
+        display: flex;
+        flex-direction: column;
+        gap: 0.2rem;
+    }
 
-	.amount {
-		font-weight: 600;
-		font-size: 1.05rem;
-	}
+    .amount {
+        font-weight: 600;
+        font-size: 1.05rem;
+    }
 
-	.type {
-		font-size: 0.85rem;
-		text-transform: capitalize;
-		opacity: 0.8;
-	}
+    .type {
+        font-size: 0.85rem;
+        text-transform: capitalize;
+        opacity: 0.8;
+    }
 
-	.right-meta {
-		text-align: right;
-		display: flex;
-		flex-direction: column;
-		gap: 0.2rem;
-	}
+    .right-meta {
+        text-align: right;
+        display: flex;
+        flex-direction: column;
+        gap: 0.2rem;
+    }
 
-	.category {
-		font-weight: 500;
-	}
+    .category {
+        font-weight: 500;
+    }
 
-	.date {
-		font-size: 0.8rem;
-		opacity: 0.7;
-	}
+    .date {
+        font-size: 0.8rem;
+        opacity: 0.7;
+    }
 
-	.bottom-row {
-		display: flex;
-		justify-content: space-between;
-		align-items: flex-start;
-	}
+    .bottom-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+    }
 
-	.description {
-		flex: 1;
-		word-break: break-word;
-		white-space: normal;
-		font-size: 0.9rem;
-		line-height: 1.3;
-	}
+    .description {
+        flex: 1;
+        word-break: break-word;
+        white-space: normal;
+        font-size: 0.9rem;
+        line-height: 1.3;
+    }
 }

@@ -9,8 +9,14 @@ class CategorySerializer(serializers.ModelSerializer):
 
 
 class TransactionSerializer(serializers.ModelSerializer):
-	category = CategorySerializer(read_only=True)
+	category_id = serializers.PrimaryKeyRelatedField(
+		source='category',
+		queryset=Category.objects.all(),
+		required=False,
+		allow_null=True
+	)
+	category = CategorySerializer(read_only=True)  # nested category data
 
 	class Meta:
 		model = Transaction
-		fields = ['id', 'description', 'amount', 'is_income', 'date', 'category']
+		fields = ['id', 'description', 'amount', 'is_income', 'date', 'category_id', 'category']

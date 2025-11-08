@@ -1,9 +1,10 @@
 <!-- Transaction Modal -->
 <div x-data="transactionModalApp()"
-	class="modal"
      x-show="$store.app.showTransactionModal"
      x-transition
-     :class="{ 'is-active': $store.app.showTransactionModal }"
+     :class="{
+        'is-active': $store.app.showTransactionModal,
+        'modal': !$store.app.isMobile}"
      x-trap.noscroll="$store.app.showTransactionModal"
      @keydown.escape.window="if (!isSubmitting && !$store.app.showCategoryModal) $store.app.closeTransactionModal()">
 
@@ -48,25 +49,25 @@
 				<div class="field-category">
 					<div class="field-body">
 						<!-- Type: Income / Expense -->
-						<div class="field">
-							<label class="label">Type</label>
-							<div class="control">
-								<div class="buttons has-addons">
-									<button type="button"
-									        class="button"
-									        :class="{ 'is-success is-selected': $store.app.isIncome }"
-									        @click="$store.app.isIncome = true; $store.app.setIncome()">
-										<span>Income</span>
-									</button>
-									<button type="button"
-									        class="button"
-									        :class="{ 'is-danger is-selected': !$store.app.isIncome }"
-									        @click="$store.app.isIncome = false; $store.app.setExpense()">
-										<span>Expense</span>
-									</button>
-								</div>
-							</div>
-						</div>
+<div class="field">
+                <label class="label">Type</label>
+                <div class="control">
+                    <div class="buttons has-addons">
+                        <button type="button"
+                                class="button"
+                                :class="{ 'is-success is-selected': isIncome }"
+                                @click="toggleIncome()">
+                            <span>Income</span>
+                        </button>
+                        <button type="button"
+                                class="button"
+                                :class="{ 'is-danger is-selected': !isIncome }"
+                                @click="toggleExpense()">
+                            <span>Expense</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
 
 						<!-- Category -->
 						<div class="field">
@@ -105,7 +106,7 @@
 		<footer class="modal-card-foot" style="justify-content: flex-end;">
 			<button class="button is-success"
 			        type="submit"
-			        @click="addTransaction"
+			        @click="addTransaction()"
 			        :aria-busy="isSubmitting"
 			        :disabled="isSubmitting">
 				<span x-show="!isSubmitting">Save</span>

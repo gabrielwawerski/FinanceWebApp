@@ -33,13 +33,8 @@ function transactionApp() {
         },
 
         get filteredCategoriesForFilter() {
-            // Determine type filter: null = all types
-            const type = this.filters.type; // "income", "expense", or ""
-
-            return this.$store.app.categories.filter(c => {
-                if (!type) return true; // show all if no type selected
-                return c.type === type;  // only categories matching type
-            });
+            const type = this.filters.type || null; // '' becomes null for "all"
+            return getFilteredCategories(Alpine.store('transactions').categories, type);
         },
 
         toggleSort(column) {
@@ -62,7 +57,7 @@ function transactionApp() {
 
 
         get filteredTransactions() {
-            let txs = this.$store.app.transactions.filter(t => {
+            let txs = Alpine.store('transactions').transactions.filter(t => {
                 const descMatch = t.description.toLowerCase().includes(this.filters.description.toLowerCase());
                 const typeMatch = this.filters.type ? (this.filters.type === 'income' ? t.is_income : !t.is_income) : true;
                 const categoryMatch = this.filters.category ? t.category?.id == this.filters.category : true;
@@ -103,12 +98,6 @@ function transactionApp() {
             }
 
             return txs;
-        },
-
-
-        get selectedCategoryColor() {
-            const cat = this.filteredCategories.find(c => c.id == this.selectedCategoryId); // note == instead of ===
-            return cat ? cat.color : '#000';
         },
 
         get visiblePages() {
@@ -169,10 +158,6 @@ function transactionApp() {
         },
         goPrevPage() {
             if (this.currentPage > 1) this.currentPage--;
-        },
-
-        get balance() {
-            return this.$store.app.balance;
         },
     };
 }

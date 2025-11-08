@@ -5,8 +5,8 @@
 <head>
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<title>{% block title %}Finance App{% endblock %}</title>
-	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css">
+	<title>{% block title %}Finance Manager{% endblock %}</title>
+
 	<link rel="stylesheet" href="{% static 'app/css/vendor/bulma.min.css' %}">
 	<link rel="stylesheet" href="{% static 'app/css/style.css' %}">
 
@@ -16,15 +16,14 @@
 </head>
 
 <body>
-
 <nav class="navbar is-transparent" role="navigation" aria-label="main navigation" x-data="{ open: false }">
 	<div class="container">
 		<div class="navbar-brand">
 			<a class="navbar-item has-text-weight-semibold" href="{% url 'dashboard' %}">Dashboard</a>
 			<!-- Mobile burger menu -->
 			<a role="button" class="navbar-burger" aria-label="menu" aria-expanded="false"
-               :class="{ 'is-active': open }"
-               @click="open = !open">
+			   :class="{ 'is-active': open }"
+			   @click="open = !open">
 				<span aria-hidden="true"></span>
 				<span aria-hidden="true"></span>
 				<span aria-hidden="true"></span>
@@ -34,7 +33,6 @@
 
 		<div id="main-navbar" class="navbar-menu" :class="{ 'is-active': open }">
 			<div class="navbar-start">
-
 				<a class="navbar-item" href="#">Transactions</a>
 				<a class="navbar-item" href="#">Obligations</a>
 				<a class="navbar-item" href="#">Crypto</a>
@@ -42,25 +40,22 @@
 
 			<div class="navbar-end">
 				{% if user.is_authenticated %}
-				<a class="navbar-item" @click="$store.app.isDarkTheme = !$store.app.isDarkTheme">Settings</a>
+				<!-- Theme toggle using store helper -->
+				<a class="navbar-item" @click="$store.app.toggleTheme()">Settings</a>
 
-              <a x-data @click="$refs.logoutForm.submit()" class="navbar-item is-light is-outlined">
-	              Logout
-              </a>
+				<a x-data @click="$refs.logoutForm.submit()" class="navbar-item is-light is-outlined">
+					Logout
+				</a>
 
-					<!-- Hidden form for POST + CSRF -->
-					<form x-ref="logoutForm" method="POST" action="{% url 'logout_view' %}" style="display: none;">
-						{% csrf_token %}
-					</form>
+				<!-- Hidden logout form -->
+				<form x-ref="logoutForm" method="POST" action="{% url 'logout_view' %}" style="display: none;">
+					{% csrf_token %}
+				</form>
 				{% else %}
 				<div class="navbar-item">
 					<div class="buttons">
-						<a class="button is-light" href="{% url 'login' %}">
-							Login
-						</a>
-						<a class="button is-primary" href="{% url 'register' %}">
-							Register
-						</a>
+						<a class="button is-light" href="{% url 'login' %}">Login</a>
+						<a class="button is-primary" href="{% url 'register' %}">Register</a>
 					</div>
 				</div>
 				{% endif %}
@@ -71,6 +66,17 @@
 
 {% block content %}{% endblock %}
 
+{% block extra_js %}{% endblock %}
+
+<script>
+    window.csrf_token = "{{ csrf_token }}";
+    window.initialTransactions = {{ transactions_json | safe }};
+    window.initialCategories = {{ categories_json | safe }};
+    window.transactionsApiUrl = "{% url 'transaction-list' %}";
+    console.log("initialCategories:", window.initialCategories)
+</script>
+
+<!-- Load Alpine & plugins -->
 <!--<footer class="footer">-->
 <!--	<div class="container has-text-centered">-->
 <!--		<p>&copy; 2025 Finance App</p>-->
@@ -83,11 +89,16 @@
 <script src="{% static 'app/js/vendor/alpine.focus.min.js' %}" defer data-turbo-eval="false"></script>
 <script src="{% static 'app/js/vendor/alpine.min.js' %}" defer></script>
 
-<!-- Load components after Alpine -->
-<script src="{% static 'app/js/app_store.js' %}"></script>
-<script src="{% static 'app/js/components/category_component.js' %}"></script>
-<script src="{% static 'app/js/components/transaction_component.js' %}"></script>
-<script src="{% static 'app/js/components/transaction_modal_component.js' %}"></script>
-<script src="{% static 'app/js/components/chart_component.js' %}"></script>
+
+<!-- Load stores -->
+<script src="{% static 'app/js/utils.js' %}"></script>
+
+<script src="{% static 'app/js/stores/store.js' %}"></script>
+<script src="{% static 'app/js/stores/transactions.js' %}"></script>
+
+<script src="{% static 'app/js/components/category_component.js' %}" ></script>
+<script src="{% static 'app/js/components/transaction_component.js' %}" ></script>
+<script src="{% static 'app/js/components/transaction_modal_component.js' %}" ></script>
+<script src="{% static 'app/js/components/chart_component.js' %}" ></script>
 </body>
 </html>

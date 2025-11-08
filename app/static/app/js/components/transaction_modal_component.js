@@ -1,70 +1,70 @@
 function transactionModalApp() {
-	return {
-		transactionDescription: '',
-		transactionAmount: '',
-		selectedCategoryId: null,
-		isSubmitting: false,
-		filteredCategories: [],
+    return {
+        transactionDescription: '',
+        transactionAmount: '',
+        selectedCategoryId: null,
+        isIncome: true,  // Local now
+        isSubmitting: false,
+        filteredCategories: [],
 
-		init() {
-			this.updateFilteredCategories();
+        init() {
+            this.updateFilteredCategories();
+            this.$watch('isIncome', () => this.updateFilteredCategories());  // Watch local
+            this.$watch(() => Alpine.store('transactions').categories, () => this.updateFilteredCategories());  // Explicit store watch
+            document.addEventListener('category-added', e => {
+                this.updateFilteredCategories(e.detail);
+            });
+        },
 
-			this.$watch('$store.app.isIncome', () => {
-				this.updateFilteredCategories();
-			});
+        get selectedCategoryColor() {
+            const cat = this.filteredCategories.find(c => c.id == this.selectedCategoryId);
+            return cat ? cat.color : '#000';
+        },
 
-			document.addEventListener('category-added', e => {
-				this.updateFilteredCategories(e.detail);
-			});
-		},
+        updateFilteredCategories(newCategoryId = null) {
+            const type = this.isIncome ? 'income' : 'expense';
+            this.filteredCategories = getFilteredCategories(Alpine.store('transactions').categories, type);
 
-		get selectedCategoryColor() {
-	const cat = this.filteredCategories.find(c => c.id == this.selectedCategoryId);
-	return cat ? cat.color : '#000';
-},
+            if (newCategoryId) {
+                this.selectedCategoryId = newCategoryId;
+            } else if (!this.filteredCategories.find(c => c.id === this.selectedCategoryId)) {
+                this.selectedCategoryId = this.filteredCategories.length ? this.filteredCategories[0].id : null;
+            }
+        },
 
-		updateFilteredCategories(newCategoryId = null) {
-			const type = this.$store.app.isIncome ? 'income' : 'expense';
-			this.filteredCategories = this.$store.app.categories.filter(c => c.type === type);
+        async addTransaction() {
+            if (!this.transactionDescription || !this.transactionAmount || !this.selectedCategoryId) return;  // Basic validation
 
-			if (newCategoryId) {
-				this.selectedCategoryId = newCategoryId;
-			} else if (!this.filteredCategories.find(c => c.id === this.selectedCategoryId)) {
-				this.selectedCategoryId = this.filteredCategories.length ? this.filteredCategories[0].id : null;
-			}
-		},
+            this.isSubmitting = true;
+            const payload = {
+                description: this.transactionDescription,
+                amount: this.transactionAmount,
+                is_income: this.isIncome,
+                category_id: this.selectedCategoryId
+            };
 
-		async addTransaction() {
-			this.isSubmitting = true;
-			try {
-				const res = await fetch(window.transactionsApiUrl, {
-					method: "POST",
-					headers: {
-						"Content-Type": "application/json",
-						"X-CSRFToken": window.csrf_token
-					},
-					body: JSON.stringify({
-						description: this.transactionDescription,
-						amount: this.transactionAmount,
-						is_income: this.$store.app.isIncome,
-						category: this.selectedCategoryId
-					})
-				});
+            try {
+                await Alpine.store('transactions').addTransaction(payload);
+                // Success: Reset and close
+                this.transactionDescription = '';
+                this.transactionAmount = '';
+                this.selectedCategoryId = null;
+                this.updateFilteredCategories();
+                Alpine.store('app').closeTransactionModal();
+            } catch (e) {
+                console.error(e);
+                // Optional: Add local error state/display (e.g., this.error = e.message)
+            } finally {
+                this.isSubmitting = false;
+            }
+        },
 
-				if (!res.ok) throw new Error("Failed to save transaction");
-				const data = await res.json();
+        toggleIncome() {
+            this.isIncome = true;
+        },
 
-				this.$store.app.addTransaction(data);
-
-				this.transactionDescription = '';
-				this.transactionAmount = '';
-				this.updateFilteredCategories();
-				this.$store.app.closeTransactionModal();
-			} catch (e) {
-				console.error(e);
-			} finally {
-				this.isSubmitting = false;
-			}
-		},
-	};
+        toggleExpense() {
+            this.isIncome = false;
+        },
+    };
 }
