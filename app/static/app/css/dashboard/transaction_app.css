@@ -58,14 +58,24 @@
 	background-color: hsl(204, 86%, 95%); /* subtle light blue */
 }
 
-
-.tx-card .level {
-    width: 100%;
+/* Tag default */
+.tag.is-clickable {
+	background-color: transparent;
+	transition: background-color 0.2s;
+	cursor: pointer;
 }
 
-.tx-card__left {
-    min-width: 0;
+/* When the card is hovered, update the tag's background using CSS variable */
+.card.tx-card:hover .tag.is-clickable {
+	background-color: var(--category-color);
 }
+
+/* Optional: remove transition and background instantly on click */
+.tag.is-clickable:active {
+	background-color: transparent;
+	transition: none;
+}
+
 
 .tx-card__title {
     font-weight: 500 !important;
