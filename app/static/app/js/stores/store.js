@@ -104,7 +104,6 @@ document.addEventListener('alpine:init', () => {
             const minInterval = 1000;
             if (this.lastSyncTime && now - this.lastSyncTime < minInterval) return;
             this.lastSyncTime = now;
-            this.setLoading(true);
 
             await this.bootstrap();
         },

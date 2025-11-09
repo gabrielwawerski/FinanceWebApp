@@ -11,6 +11,8 @@ function transactionApp() {
             category: ''    // '', or category id as string
         },
 
+        skeletonsVisible: false,
+
         // --- Derived data ---
         get allTransactions() {
             return this.$store.transactions?.transactions || [];

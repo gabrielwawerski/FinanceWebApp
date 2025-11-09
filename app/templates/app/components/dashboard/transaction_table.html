@@ -25,7 +25,7 @@
 			</template>
 
 			<!-- Skeletons -->
-			<template x-if="$store.app.isLoading">
+			<template x-if="$store.app.isLoading" x-effect="skeletonsVisible = $store.app.isLoading" :>
 				<template x-for="i in pageSize" :key="`skeleton-${i}`">
 					<div class="tx-card skeleton-block"
 					     :style="{ height: $store.settings.isCompactMode
@@ -42,7 +42,10 @@
 			<!-- Transaction cards -->
 			<template x-for="t in paginatedTransactions" :key="t.id">
 				<div class="card tx-card"
-				     :class="$store.settings.isCompactMode ? 'mb-1' : 'mb-2'"
+				     :class="[
+							$store.settings.isCompactMode ? 'mb-1' : 'mb-2',
+							{ 'skeleton-block': $store.app.isLoading }
+						]"
 				     :style="$store.settings.isCompactMode
 				     ? 'display:flex; align-items:center; justify-content:space-between; gap:0.75rem; transition: all 0.3s ease; min-height: 40px; overflow:hidden; font-size:0.8rem;'
 				     : 'transition: all 0.3s ease; max-height:200px; font-size:inherit;'"
@@ -113,7 +116,7 @@
 
 
 			<!-- Invisible fillers (only if there are transactions and fillerCount > 0) -->
-			<template x-for="i in fillerCount" :key="`filler-${i}-${$store.settings.isCompactMode}`">
+			<template x-if="!skeletonsVisible" x-for="i in fillerCount" :key="`filler-${i}-${$store.settings.isCompactMode}`">
 				<div class="card tx-card tx-card--filler is-invisible"
 				     :class="{'is-compact': $store.settings.isCompactMode,
                   'is-default': !$store.settings.isCompactMode}"></div>
@@ -121,7 +124,7 @@
 		</div>
 
 		<div class="transactions-toolbar">
-			<template x-if="!$store.app.isMobile">
+			<template x-if="!$store.app.isMobile" x-cloak>
 				{% include "app/components/dashboard/transaction_filters.html" %}
 			</template>
 		</div>

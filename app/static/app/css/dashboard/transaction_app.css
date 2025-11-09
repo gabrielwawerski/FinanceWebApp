@@ -1,7 +1,7 @@
 /*********** TRANSACTIONS ***********/
 :root {
-	--tx-card-height-default: 68px;
-	--tx-card-height-compact: 40px;
+	--tx-card-height-default: 70px;
+	--tx-card-height-compact: 42px;
 }
 
 .transactions-section {
@@ -43,11 +43,10 @@
 /*********** CARD ***********/
 .tx-card {
 	background: linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(245, 245, 245, 0.95));
-	border: none;
+	border: 1px solid transparent;
 	border-radius: 12px;
 	box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08), 0 8px 20px rgba(0, 0, 0, 0.05);
-	transition: all 0.3s ease;
-}
+transition: color 0.2s, background-color 0.2s, border 0.2s;}
 
 [data-theme="dark"] .tx-card {
     background: linear-gradient(135deg, #2a2a2a, #1f1f1f);
@@ -61,7 +60,6 @@
 .tx-card:hover {
 	border: 1px solid hsl(204, 86%, 53%);
 	color: hsl(204, 86%, 53%);
-	background-color: hsl(204, 86%, 95%); /* subtle light blue */
 }
 
 /* Tag default */
