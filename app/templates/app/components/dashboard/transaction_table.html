@@ -9,7 +9,7 @@
 
 		<!-- Skeletons -->
 		<div class="transactions-grid tx-skeleton"
-		     x-show="isLoading && transactions?.length > 0"
+		     x-show="isLoading && ($store.transactions.transactions?.length ?? 0) > 0"
 		     x-transition.opacity>
 			<template x-for="i in pageSize" :key="`skeleton-${i}`">
 				<div class="card tx-card">
