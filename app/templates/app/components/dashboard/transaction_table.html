@@ -9,33 +9,39 @@
 		</div>
 
 		<!-- Skeletons -->
-		<div class="transactions-grid tx-skeleton"
-		     x-show="isLoading && ($store.transactions.transactions?.length ?? 0) > 0"
-		     x-transition.opacity>
-			<template x-for="i in pageSize" :key="`skeleton-${i}`">
-				<div class="card tx-card mb-2"
-				     :class="{'is-compact': $store.settings.isCompactMode,
-						'is-default': !$store.settings.isCompactMode}">
-					<div class="card-content p-4">
-						<div class="level media">
-							<div class="level-left tx-card__left" style="flex: 1;">
-								<div class="skeleton-line is-skeleton"
-								     style="width: 30%; height: 0.8rem; margin-bottom: 0.5rem;"></div>
-								<div class="skeleton-line is-skeleton"
-								     style="width: 75%; height: 1rem;"></div>
-							</div>
-							<div class="level-right tx-card__right" style="min-width: 9rem;">
-								<div class="skeleton-line is-skeleton"
-								     style="width: 5.5rem; height: 1.2rem;"></div>
+		<div class="transactions-grid tx-skeleton" x-transition.opacity>
+			<template x-if="isLoading && ($store.transactions.transactions?.length ?? 0) > 0">
+				<template x-for="i in pageSize" :key="`skeleton-${i}`">
+					<div class="card tx-card"
+					     :class="{
+         'is-compact': $store.settings.isCompactMode,
+         'is-default': !$store.settings.isCompactMode,
+         'mb-1': $store.settings.isCompactMode,
+         'mb-2': !$store.settings.isCompactMode
+     }"
+					     :style="$store.settings.isCompactMode
+         ? 'display:flex; align-items:center; justify-content:space-between; gap:0.75rem; transition: all 0.3s ease; min-height: 40px; overflow:hidden; font-size:0.8rem;'
+         : 'transition: all 0.3s ease; max-height:200px; font-size:inherit; min-height: 72px;'">
+
+						<div class="card-content p-4">
+							<div class="level media">
+								<div class="level-left tx-card__left" style="flex: 1;">
+									<div class="is-skeleton"
+									     style="width: 30%; height: 0.8rem; margin-bottom: 0.5rem;"></div>
+									<div class="is-skeleton" style="width: 75%; height: 1rem;"></div>
+								</div>
+								<div class="level-right tx-card__right" style="min-width: 9rem;">
+									<div class="is-skeleton" style="width: 5.5rem; height: 1.2rem;"></div>
+								</div>
 							</div>
 						</div>
 					</div>
-				</div>
+				</template>
 			</template>
 		</div>
 
 		<!-- Real content -->
-		<div class="transactions-grid" x-show="!isLoading" x-transition.opacity>
+		<div class="transactions-grid" x-show="!isLoading" x-transitio.opacityn>
 			<!-- No transactions message -->
 			<template x-if="paginatedTransactions.length === 0">
 				<div class="notification tx-card"
@@ -45,10 +51,9 @@
 			</template>
 
 			<!-- Transaction cards -->
-			<!-- Transaction cards -->
 			<template x-for="t in paginatedTransactions" :key="t.id">
-				<div class="card tx-card mb-2"
-				     :class="$store.settings.isCompactMode ? ' mb-1' : ''"
+				<div class="card tx-card"
+				     :class="$store.settings.isCompactMode ? 'mb-1' : 'mb-2'"
 				     :style="$store.settings.isCompactMode
             ? 'display:flex; align-items:center; justify-content:space-between; gap:0.75rem; transition: all 0.3s ease; min-height: 40px; overflow:hidden; font-size:0.8rem;'
             : 'transition: all 0.3s ease; max-height:200px; font-size:inherit;'">
@@ -63,17 +68,17 @@
 									     style="white-space: pre-line;"></div>
 								</div>
 								<div class="media-right"
-								     style="display:flex; flex-direction:column; align-items:flex-end; gap:0.25rem;">
+								     style="display:flex; flex-direction:column; align-items:flex-end;">
                         <span class="tag is-clickable is-unselectable"
                               :style="`color: ${$store.app.isDarkTheme ? '#fff' : '#000'}; border: 1px solid ${t.category?.color || '#888'};`"
                               x-text="t.category?.name || 'Uncategorized'"
                               @click="
-          if (filters.category === String(t.category?.id)) {
-              clearFilters();
-          } else {
-              filters.category = String(t.category?.id);
-          }
-      ">
+								if (filters.category === String(t.category?.id)) {
+                                    clearFilters();
+								} else {
+                                    filters.category = String(t.category?.id);
+								}
+                              ">
                         </span>
 									<p class="is-size-6 has-text-weight-semibold"
 									   :class="t.is_income ? 'has-text-success' : 'has-text-danger'"
@@ -85,21 +90,23 @@
 
 					<template x-if="$store.settings.isCompactMode">
 						<!-- Compact inline view -->
-						<div class="card-content-" style="display:flex; align-items:center; gap:0.75rem; width:100%;">
-							<div class="tx-card__meta has-text-grey" x-text="formatDate(t.date)"
-							     style="flex:0 0 auto;"></div>
+						<div class="card-content" style="display:flex; align-items:center; gap:0.75rem; width:100%;">
+							<div class="tx-card__meta has-text-grey"
+							     x-text="formatCompactDate(t.date)"
+							></div>
+
 							<div class="tx-card__title" x-text="t.description || '(No description)'"
 							     style="flex:1 1 auto; min-width:0; overflow:hidden; text-overflow:ellipsis;"></div>
 							<span class="tag is-clickable is-unselectable"
 							      :style="`color: ${$store.app.isDarkTheme ? '#fff' : '#000'}; border: 1px solid ${t.category?.color || '#888'}; flex:0 0 auto;`"
 							      x-text="t.category?.name || 'Uncategorized'"
 							      @click="
-          if (filters.category === String(t.category?.id)) {
-              clearFilters();
-          } else {
-              filters.category = String(t.category?.id);
-          }
-      ">
+                                    if (filters.category === String(t.category?.id)) {
+                                        clearFilters();
+                                    } else {
+                                        filters.category = String(t.category?.id);
+                                    }
+                                  ">
                 </span>
 							<p class="is-size-6 has-text-weight-semibold"
 							   :class="t.is_income ? 'has-text-success' : 'has-text-danger'"

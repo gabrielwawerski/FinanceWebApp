@@ -32,7 +32,7 @@
     display: grid;
     grid-template-columns: 1fr;
     gap: 0 !important;
-    margin-top: 1rem;
+    margin-bottom: 0.5rem;
 }
 
 /*********** CARD ***********/
@@ -104,6 +104,8 @@
 .tag {
     background-color: rgba(0, 0, 0, 0.05);
     border: 1px solid currentColor;
+    flex:0 0 auto;
+    text-overflow: ellipsis;
 }
 
 /* Dark mode adjustments */
@@ -186,11 +188,11 @@
 
 /* Default (non-compact) mode height */
 .tx-card--filler.is-invisible.is-default {
-	height: 72px !important;
+	height: 68px !important;
 }
 
 .tx-card--filler.is-invisible.is-compact {
-	height: 36px !important;
+	height: 40px !important;
 }
 
 .balance-container {
