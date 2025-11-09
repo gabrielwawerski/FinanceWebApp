@@ -19,7 +19,7 @@
 <nav class="navbar is-transparent" role="navigation" aria-label="main navigation" x-data="{ open: false }">
 	<div class="container is-max-desktop">
 		<div class="navbar-brand">
-			<a class="navbar-item has-text-weight-semibold" href="{% url 'dashboard' %}">Dashboard</a>
+			<a class="navbar-item has-text-weight-semibold" href="{% url 'dashboard' %}" @click="open = false">Dashboard</a>
 			<!-- Mobile burger menu -->
 			<a role="button" class="navbar-burger" aria-label="menu" aria-expanded="false"
 			   :class="{ 'is-active': open }"
@@ -33,17 +33,17 @@
 
 		<div id="main-navbar" class="navbar-menu" :class="{ 'is-active': open }">
 			<div class="navbar-start">
-				<a class="navbar-item" href="#">Transactions</a>
-				<a class="navbar-item" href="#">Obligations</a>
-				<a class="navbar-item" href="#">Crypto</a>
+<!--				<a class="navbar-item" href="#">Transactions</a>-->
+<!--				<a class="navbar-item" href="#">Obligations</a>-->
+<!--				<a class="navbar-item" href="#">Crypto</a>-->
 			</div>
 
 			<div class="navbar-end">
 				{% if user.is_authenticated %}
 				<!-- Theme toggle using store helper -->
-				<a class="navbar-item" @click="$store.app.toggleTheme()">Settings</a>
+				<a class="navbar-item" @click="$store.app.toggleTheme(); open = false;">Theme</a>
 
-				<a x-data @click="$refs.logoutForm.submit()" class="navbar-item is-light is-outlined">
+				<a x-data @click="$refs.logoutForm.submit(); open = false" class="navbar-item is-light is-outlined">
 					Logout
 				</a>
 
@@ -53,7 +53,8 @@
 				</form>
 				{% else %}
 				<div class="navbar-item">
-					<div class="buttons">
+					<div class="buttons" style="display: flex; justify-content: center !important; width: 100%;">
+						<a class="button " @click="$store.app.toggleTheme(); open = false;">Theme</a>
 						<a class="button is-light" href="{% url 'login' %}">Login</a>
 						<a class="button is-primary" href="{% url 'register' %}">Register</a>
 					</div>

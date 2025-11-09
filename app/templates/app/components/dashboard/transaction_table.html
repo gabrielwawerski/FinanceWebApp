@@ -8,18 +8,22 @@
 		</div>
 
 		<!-- Skeletons -->
-		<div class="transactions-grid tx-skeleton" x-show="isLoading" x-transition.opacity>
+		<div class="transactions-grid tx-skeleton"
+		     x-show="isLoading && transactions.length > 0"
+		     x-transition.opacity>
 			<template x-for="i in pageSize" :key="`skeleton-${i}`">
 				<div class="card tx-card">
-					<div class="card-content p-3">
-						<div class="level is-mobile">
+					<div class="card-content p-4">
+						<div class="level media">
 							<div class="level-left tx-card__left" style="flex: 1;">
 								<div class="skeleton-line is-skeleton"
 								     style="width: 30%; height: 0.8rem; margin-bottom: 0.5rem;"></div>
-								<div class="skeleton-line is-skeleton" style="width: 75%; height: 1rem;"></div>
+								<div class="skeleton-line is-skeleton"
+								     style="width: 75%; height: 1rem;"></div>
 							</div>
 							<div class="level-right tx-card__right" style="min-width: 9rem;">
-								<div class="skeleton-line is-skeleton" style="width: 5.5rem; height: 1.2rem;"></div>
+								<div class="skeleton-line is-skeleton"
+								     style="width: 5.5rem; height: 1.2rem;"></div>
 							</div>
 						</div>
 					</div>
@@ -31,7 +35,8 @@
 		<div class="transactions-grid" x-show="!isLoading" x-transition.opacity>
 			<!-- No transactions message -->
 			<template x-if="paginatedTransactions.length === 0">
-				<div class="notification tx-card" style="font-size:1.06rem;display:flex; align-items:center; justify-content:center;">
+				<div class="notification tx-card"
+				     style="font-size:1.06rem;display:flex; align-items:center; justify-content:center;">
 					No transactions found.
 				</div>
 			</template>
@@ -51,10 +56,6 @@
 							<!-- Right: Amount + Category -->
 							<div class="media-right"
 							     style="display:flex; flex-direction:column; align-items:flex-end; gap:0.25rem;">
-								<p class="is-size-6 has-text-weight-semibold"
-								   :class="t.is_income ? 'has-text-success' : 'has-text-danger'"
-								   x-text="formatAmount(t.amount, t.currency || 'PLN')"></p>
-
 								<!-- Category tag with category's color -->
 								<span class="tag"
 								      :style="`
@@ -62,6 +63,10 @@
                border: 1px solid ${t.category?.color || '#888'};`"
 								      x-text="t.category?.name || 'Uncategorized'">
                                 </span>
+
+								<p class="is-size-6 has-text-weight-semibold"
+								   :class="t.is_income ? 'has-text-success' : 'has-text-danger'"
+								   x-text="formatAmount(t.amount, t.currency || 'PLN')"></p>
 							</div>
 						</div>
 					</div>
@@ -70,8 +75,8 @@
 
 			<!-- Invisible fillers (only if there are transactions and fillerCount > 0) -->
 			<template x-for="i in fillerCount" :key="`filler-${i}`">
-    <div class="card tx-card tx-card--filler is-invisible"></div>
-</template>
+				<div class="card tx-card tx-card--filler is-invisible"></div>
+			</template>
 		</div>
 
 		<div class="transactions-toolbar">
