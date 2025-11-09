@@ -2,6 +2,11 @@
 <div x-data="transactionModalApp()"
      x-show="$store.app.showTransactionModal"
      x-transition
+     x-init="$watch('$store.app.showTransactionModal', value => {
+         if(value) {
+             setTimeout(() => $refs.amountInput?.focus(), 50);
+         }
+     })"
      class="modal"
      :class="{
         'is-active': $store.app.showTransactionModal}"
@@ -31,6 +36,7 @@
 						       type="number"
 						       step="1"
 						       x-model="transactionAmount"
+						       x-ref="amountInput"
 						       placeholder="0.00"
 						       required>
 					</div>

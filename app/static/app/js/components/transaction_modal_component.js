@@ -3,7 +3,7 @@ function transactionModalApp() {
         transactionDescription: '',
         transactionAmount: '',
         selectedCategoryId: null,
-        isIncome: true,  // Local now
+        isIncome: safePersist(false, "isIncome"),  // Local now
         isSubmitting: false,
         filteredCategories: [],
 
