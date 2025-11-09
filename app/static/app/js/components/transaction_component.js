@@ -1,163 +1,188 @@
 function transactionApp() {
     return {
-        transactionDescription: '',
-        transactionAmount: '',
-        selectedCategoryId: null,
-        isSubmitting: false,
+        // --- UI state ---
+        isLoading: true,
         currentPage: 1,
-        pageSize: 5,
+        pageSize: Alpine.$persist(Number(5)),         // default 5
 
-        filteredCategories: [],
-
+        // --- Filters (unified) ---
         filters: {
             description: '',
-            type: '',
-            category: ''
+            type: '',       // '', 'income', 'expense'
+            category: ''    // '', or category id as string
         },
 
-        sort: {
-            column: null, // e.g., 'date', 'description', 'amount'
-            direction: null // 'asc' or 'desc'; null = unsorted
+        // --- Derived data ---
+        get allTransactions() {
+            return this.$store.transactions?.transactions || [];
         },
 
-        init() {
-            this.$watch('filters', () => {
-                this.currentPage = 1;
-            }, {deep: true});
+        get categories() {
+            return this.$store.transactions?.categories || [];
         },
-
-        get selectedCategoryColor() {
-            if (!this.filters.category) return '#000';
-            const cat = this.filteredCategoriesForFilter.find(c => c.id == this.filters.category);
-            return cat ? cat.color : '#000';
-        },
-
-        get filteredCategoriesForFilter() {
-            const type = this.filters.type || null; // '' becomes null for "all"
-            return getFilteredCategories(Alpine.store('transactions').categories, type);
-        },
-
-        toggleSort(column) {
-            if (this.sort.column === column) {
-                // cycle direction: asc → desc → none
-                if (this.sort.direction === 'asc') {
-                    this.sort.direction = 'desc';
-                } else if (this.sort.direction === 'desc') {
-                    this.sort.column = null;
-                    this.sort.direction = null;
-                } else {
-                    this.sort.direction = 'asc';
-                }
-            } else {
-                this.sort.column = column;
-                this.sort.direction = 'asc';
-            }
-            this.currentPage = 1; // reset page on sort
-        },
-
 
         get filteredTransactions() {
-            let txs = Alpine.store('transactions').transactions.filter(t => {
-                const descMatch = t.description.toLowerCase().includes(this.filters.description.toLowerCase());
-                const typeMatch = this.filters.type ? (this.filters.type === 'income' ? t.is_income : !t.is_income) : true;
-                const categoryMatch = this.filters.category ? t.category?.id == this.filters.category : true;
-                return descMatch && typeMatch && categoryMatch;
-            });
+            let list = [...this.allTransactions];
 
-            if (this.sort.column && this.sort.direction) {
-                txs.sort((a, b) => {
-                    let valA, valB;
-
-                    switch (this.sort.column) {
-                        case 'date':
-                            valA = new Date(a.date);
-                            valB = new Date(b.date);
-                            break;
-                        case 'description':
-                            valA = a.description.toLowerCase();
-                            valB = b.description.toLowerCase();
-                            break;
-                        case 'category':
-                            valA = a.category?.name?.toLowerCase() || '';
-                            valB = b.category?.name?.toLowerCase() || '';
-                            break;
-                        case 'type':
-                            valA = a.is_income ? 1 : 0;
-                            valB = b.is_income ? 1 : 0;
-                            break;
-                        case 'amount':
-                            valA = parseFloat(a.amount);
-                            valB = parseFloat(b.amount);
-                            break;
-                    }
-
-                    if (valA < valB) return this.sort.direction === 'asc' ? -1 : 1;
-                    if (valA > valB) return this.sort.direction === 'asc' ? 1 : -1;
-                    return 0;
-                });
+            // --- Filter by description / note ---
+            const q = (this.filters.description || '').trim().toLowerCase();
+            if (q) {
+                list = list.filter(t =>
+                    (String(t.description || '')).toLowerCase().includes(q) ||
+                    (String(t.note || t.notes || '')).toLowerCase().includes(q)
+                );
             }
 
-            return txs;
+            // --- Filter by type ---
+            if (this.filters.type) {
+                list = list.filter(t => this.resolveType(t) === this.filters.type);
+            }
+
+            // --- Filter by category ---
+            if (this.filters.category) {
+                list = list.filter(t => String(t.category_id) === String(this.filters.category));
+            }
+
+            return list;
         },
 
-        get visiblePages() {
-            const totalPages = this.totalPages;
-            const currentPage = this.currentPage;
-            const visible = [];
+        get displayedCount() {
+    return Math.max(1, this.paginatedTransactions.length); // count "No transactions found." as 1
+},
 
-            // tweak these
-            const edgeCount = 3;      // how many pages to show near the start or end
-            const windowSize = 1;     // how many pages to show around the current page
-
-            // show all if total pages small
-            if (totalPages <= edgeCount + 2) {
-                for (let i = 1; i <= totalPages; i++) visible.push(i);
-                return visible;
-            }
-
-            const nearStart = currentPage <= edgeCount - 1;
-            const nearEnd = currentPage >= totalPages - edgeCount + 2;
-
-            if (nearStart) {
-                // Example: 1 2 3 4 5 ... 16
-                for (let i = 1; i <= edgeCount; i++) visible.push(i);
-                visible.push('...');
-                visible.push(totalPages);
-            } else if (nearEnd) {
-                // Example: 1 ... 12 13 14 15 16
-                visible.push(1);
-                visible.push('...');
-                for (let i = totalPages - edgeCount + 1; i <= totalPages; i++) visible.push(i);
-            } else {
-                // Example: 1 ... 7 8 9 ... 16
-                const startWindow = currentPage - windowSize;
-                const endWindow = currentPage + windowSize;
-
-                visible.push(1);
-                visible.push('...');
-                for (let i = startWindow; i <= endWindow; i++) visible.push(i);
-                visible.push('...');
-                visible.push(totalPages);
-            }
-
-            return visible;
+        get filteredCategories() {
+            if (!this.filters.type) return this.categories; // show all if no type selected
+            return this.categories.filter(c => c.type === this.filters.type);
         },
 
-        // Pagination helpers...
         get totalPages() {
             return Math.max(1, Math.ceil(this.filteredTransactions.length / this.pageSize));
         },
 
         get paginatedTransactions() {
-            const start = (this.currentPage - 1) * this.pageSize;
+            const page = Math.min(this.currentPage, this.totalPages);
+            const start = (page - 1) * this.pageSize;
             return this.filteredTransactions.slice(start, start + this.pageSize);
         },
 
-        goNextPage() {
-            if (this.currentPage < this.totalPages) this.currentPage++;
+get fillerCount() {
+    const count = this.displayedCount;
+    return count < this.pageSize ? this.pageSize - count : 0;
+},
+
+        // --- Actions / pagination ---
+        setPageSize(size) {
+			this.pageSize = Number(size) || 5; // automatically persisted
+		},
+        goToPage(page) {
+            const p = Math.min(Math.max(1, page), this.totalPages);
+            if (p !== this.currentPage) this.currentPage = p;
         },
-        goPrevPage() {
-            if (this.currentPage > 1) this.currentPage--;
+        nextPage() {
+            this.goToPage(this.currentPage + 1);
         },
+        prevPage() {
+            this.goToPage(this.currentPage - 1);
+        },
+        clearFilters() {
+            this.filters.description = '';
+            this.filters.type = '';
+            this.filters.category = '';
+            this.currentPage = 1;
+        },
+
+        // --- Helpers ---
+        formatDate(d) {
+            if (!d) return '';
+            try {
+                const date = (typeof d === 'string') ? new Date(d) : d;
+                return date.toLocaleDateString(undefined, {year: 'numeric', month: 'short', day: '2-digit'});
+            } catch {
+                return String(d);
+            }
+        },
+
+        formatAmount(n, currency = 'USD') {
+            const val = Number(n) || 0;
+
+            // Use Intl.NumberFormat just for the number (no currency)
+            const formattedNumber = new Intl.NumberFormat(undefined, {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2
+            }).format(val);
+
+            // Append currency after number
+            return `${formattedNumber} ${currency}`;
+        },
+
+        resolveType(t) {
+            if (!t) return '';
+            if (typeof t.is_income === 'boolean') return t.is_income ? 'income' : 'expense';
+            if (typeof t.amount === 'number') return t.amount >= 0 ? 'income' : 'expense';
+            return '';
+        },
+
+        amountClass(t) {
+            return this.resolveType(t) === 'expense' ? 'tx-amount--expense' : 'tx-amount--income';
+        },
+
+        // --- Init & watchers ---
+        async init() {
+            const store = this.$store.transactions;
+            const hasFetch = store && typeof store.fetchTransactions === 'function';
+
+            this.pageSize = Number(this.pageSize);
+
+            // --- Watch filters for page reset & type/category sync ---
+            const resetPage = () => this.currentPage = 1;
+
+            this.$watch('filters.description', resetPage);
+            this.$watch('filters.type', resetPage);
+            this.$watch('filters.category', resetPage);
+            this.$watch('pageSize', resetPage);
+
+            // --- Sync category/type dependencies ---
+            this.$watch('filters.type', (newType) => {
+                // Remove category if it does not match new type
+                if (this.filters.category) {
+                    const selected = this.categories.find(c => String(c.id) === String(this.filters.category));
+                    if (selected && selected.type !== newType) this.filters.category = '';
+                }
+            });
+
+            this.$watch('filters.category', (newCat) => {
+                if (!newCat) return;
+                const cat = this.categories.find(c => String(c.id) === String(newCat));
+                if (!cat) return;
+                // Auto-set type to match category
+                if (cat.type && cat.type !== this.filters.type) {
+                    this.filters.type = cat.type;
+                }
+            });
+
+            // --- Fetch data if needed ---
+            if ((store?.transactions || []).length > 0) {
+                this.isLoading = false;
+            } else {
+                this.isLoading = true;
+                try {
+                    if (hasFetch) {
+                        await store.fetchTransactions();
+                        if (typeof store.fetchCategories === 'function') {
+                            await store.fetchCategories();
+                        }
+                    } else {
+                        await new Promise(r => setTimeout(r, 300));
+                    }
+                } finally {
+                    requestAnimationFrame(() => this.isLoading = false);
+                }
+            }
+
+            // --- Keep current page in range ---
+            this.$watch(() => this.filteredTransactions.length, () => {
+                if (this.currentPage > this.totalPages) this.currentPage = this.totalPages;
+            });
+        }
     };
 }

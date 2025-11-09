@@ -2,9 +2,9 @@
 <div x-data="transactionModalApp()"
      x-show="$store.app.showTransactionModal"
      x-transition
+     class="modal"
      :class="{
-        'is-active': $store.app.showTransactionModal,
-        'modal': !$store.app.isMobile}"
+        'is-active': $store.app.showTransactionModal}"
      x-trap.noscroll="$store.app.showTransactionModal"
      @keydown.escape.window="if (!isSubmitting && !$store.app.showCategoryModal) $store.app.closeTransactionModal()">
 
@@ -91,7 +91,8 @@
 								</div>
 								<div class="control">
 									<button type="button"
-									        class="button is-info"
+									        class="button is-disabled"
+									        disabled="true"
 									        @click="$store.app.openCategoryModal()">
 										New
 									</button>

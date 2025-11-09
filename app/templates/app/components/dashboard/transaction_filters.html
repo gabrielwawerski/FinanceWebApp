@@ -1,86 +1,88 @@
-<!--	TODO: bugs when category is selected and we swap the type		-->
-<div class="transactions-filters"
->
-	<div
-		x-data="{ isOpen: false }"
-		@click.away="isOpen = false"
-		class="dropdown"
-		:class="{ 'is-active': isOpen }">
-		<div class="dropdown-trigger">
-			<button class="button" aria-haspopup="true" aria-controls="type-dropdown" @click="isOpen = !isOpen">
-				<span style="min-width: 5rem;" x-text="filters.type.charAt(0).toUpperCase() + filters.type.slice(1) || 'All Types'"></span>
-				<span class="icon is-small">
-				<i class="fas fa-angle-down" aria-hidden="true"></i>
-			</span>
-			</button>
-		</div>
+<!-- Unified Filters + Pagination Toolbar -->
+<div class="transactions-toolbar">
+	<div class="filters">
+		<button class="button is-light" :class="{
+            'is-outlined': !filters.type && !filters.category && !filters.description,
+            'is-light': $store.app.isDarkTheme,
+            'is-dark': !$store.app.isDarkTheme
+        }"
+		        @click="clearFilters"
+		        :disabled="!filters.type && !filters.category && !filters.description">
+			Clear
+		</button>
 
-		<div class="dropdown-menu" id="type-dropdown" role="menu">
-			<div class="dropdown-content is-unselectable" >
-				<a
-					:class="{ 'is-active': filters.type === '' }"
-					class="dropdown-item has-text-weight-medium"
-					href="#"
-					@click.prevent="filters.type = ''; isOpen = false;">All Types</a>
-				<a
-					:class="{ 'is-active': filters.type === 'income',
-					'has-text-white': filters.type === 'income' }"
-					class="dropdown-item has-text-weight-medium"
-					:style="`color: var(--income-color)`"
-					href="#"
-					@click.prevent="filters.type = 'income'; isOpen = false;">Income</a>
-				<a
-					:class="{ 'is-active': filters.type === 'expense',
-					 'has-text-white': filters.type === 'expense' }"
-					class="dropdown-item has-text-weight-medium"
-					:style="`color: var(--expense-color)`"
-					href="#"
-					@click.prevent="filters.type = 'expense'; isOpen = false;">Expense</a>
+		<div class="field">
+			<div class="control">
+				<div class="select">
+					<select x-model.number="pageSize">
+						<option value="5">5 / page</option>
+						<option value="10">10 / page</option>
+						<option value="20">20 / page</option>
+					</select>
+				</div>
 			</div>
 		</div>
-	</div>
 
-	<div x-data="{ isOpen: false }" class="dropdown" :class="{ 'is-active': isOpen }" @click.away="isOpen = false">
-		<div class="dropdown-trigger">
-			<button class="button" aria-haspopup="true" aria-controls="category-dropdown" @click="isOpen = !isOpen">
-			<span style="min-width: 7rem;"
-				:color="`color: ${selectedCategoryColor}`"
-			      x-text="
-				filters.category
-					? filteredCategoriesForFilter.find(c => c.id == filters.category)?.name
-					: 'All Categories'
-			"></span>
-				<span class="icon is-small">
-				<i class="fas fa-angle-down" aria-hidden="true"></i>
-			</span>
-			</button>
-		</div>
-
-		<div class="dropdown-menu" id="category-dropdown" role="menu">
-			<div class="dropdown-content is-unselectable">
-				<!-- All Categories -->
-				<a
-					href="#"
-					class="dropdown-item has-text-weight-medium"
-					:class="{ 'is-active': filters.category === '' }"
-					@click.prevent="filters.category = ''; isOpen = false">
-					All Categories
-				</a>
-
-				<!-- Dynamic categories -->
-				<template x-for="c in filteredCategoriesForFilter" :key="c.id">
-					<a href="#" class="dropdown-item has-text-weight-medium"
-					   :class="{ 'is-active': filters.category === c.id,
-					             'has-text-white': filters.category === c.id }"
-					   @click.prevent="filters.category = c.id; isOpen = false"
-					   :style="`color: ${c.color}`"
-					   x-text="c.name">
-					</a>
-				</template>
+		<div class="field">
+			<div class="control">
+				<div class="select">
+					<select x-model="filters.type">
+						<option value="">All types</option>
+						<option value="income">Income</option>
+						<option value="expense">Expense</option>
+					</select>
+				</div>
 			</div>
 		</div>
+
+		<div class="field">
+			<div class="control">
+				<div class="select">
+					<select x-model="filters.category">
+						<option value="">All categories</option>
+						<template x-for="c in filteredCategories" :key="c.id">
+							<option :value="String(c.id)" x-text="c.name"></option>
+						</template>
+					</select>
+				</div>
+			</div>
+		</div>
+
+		<!--				<div class="field has-addons is-rounded">-->
+		<div class="field is-rounded">
+			<!--			<p class="control">-->
+			<!--				<span class="button is-static">-->
+			<!--					<span class="icon"><i class="fas fa-search" aria-hidden="true"></i></span>-->
+			<!--				</span>-->
+			<!--			</p>-->
+			<p class="control is-expanded">
+				<input
+						class="input"
+						type="search"
+						placeholder="Search description"
+						x-model.debounce.250ms="filters.description"/>
+			</p>
+		</div>
+
 	</div>
 
-		<input type="text" placeholder="Search description..." x-model="filters.description"
-	       class="filter-input input is-rounded" style="margin-left: .5rem;">
+	<div class="pagination-controls">
+		<nav class="pagination is-rounded" role="navigation" aria-label="pagination">
+			<button class="pagination-previous button"
+			        :disabled="currentPage <= 1"
+			        @click="prevPage">
+				Prev
+			</button>
+			<button class="pagination-next button"
+			        :disabled="currentPage >= totalPages"
+			        @click="nextPage">
+				Next
+			</button>
+			<ul class="pagination-list" style="margin-right: 0.3rem; margin-left: 0.3rem;">
+				<li>
+					<span class="tag is-light" x-text="`Page ${currentPage} / ${totalPages}`"></span>
+				</li>
+			</ul>
+		</nav>
+	</div>
 </div>

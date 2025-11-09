@@ -1,114 +1,126 @@
 document.addEventListener('alpine:init', () => {
-	Alpine.store('app', {
-		isMobile: window.innerWidth <= 767,
-		isDarkTheme: Alpine.$persist(true).as('isDarkTheme'),
+    Alpine.store('app', {
+        isMobile: window.innerWidth <= 767,
+        isDarkTheme: Alpine.$persist(true).as('isDarkTheme'),
 
-		lastBootstrapTime: Alpine.$persist(null).as('lastBootstrapTime'),
-		lastSyncTime: Alpine.$persist(null).as('lastSyncTime'),
-		lastTransactionUpdate: Alpine.$persist(null).as('lastTransactionUpdate'),
-		lastCategoryUpdate: Alpine.$persist(null).as('lastCategoryUpdate'),
+        lastBootstrapTime: Alpine.$persist(null).as('lastBootstrapTime'),
+        lastSyncTime: Alpine.$persist(null).as('lastSyncTime'),
+        lastTransactionUpdate: Alpine.$persist(null).as('lastTransactionUpdate'),
+        lastCategoryUpdate: Alpine.$persist(null).as('lastCategoryUpdate'),
 
-		showTransactionModal: false,
+        showTransactionModal: false,
 
-		init() {
-			this.updateIsMobile();
-			window.addEventListener('resize', () => this.updateIsMobile());
+        init() {
+            this.updateIsMobile();
+            const throttle = (fn, limit) => {
+                let waiting = false;
+                return (...args) => {
+                    if (!waiting) {
+                        fn.apply(this, args);
+                        waiting = true;
+                        setTimeout(() => waiting = false, limit);
+                    }
+                };
+            };
 
-			let focusTimeout;
-			window.addEventListener('focus', () => {
-				clearTimeout(focusTimeout);
-				focusTimeout = setTimeout(() => this.syncIfNeeded(), 300);
-			});
+            // Add throttled resize listener
+			window.addEventListener('resize', throttle(() => this.updateIsMobile(), 200));
 
-			this.bootstrap();
-		},
+            let focusTimeout;
+            window.addEventListener('focus', () => {
+                clearTimeout(focusTimeout);
+                focusTimeout = setTimeout(() => this.syncIfNeeded(), 1500);
+            });
 
-		updateIsMobile() {
-			this.isMobile = window.innerWidth <= 767;
-		},
+            this.bootstrap();
+        },
 
-		toggleTheme() {
-			this.isDarkTheme = !this.isDarkTheme;
-		},
+        updateIsMobile() {
+            this.isMobile = window.innerWidth <= 767;
+        },
 
-		// --- Bootstrap / delta fetch ---
-		async bootstrap() {
-			const now = Date.now();
-			const minInterval = 1000;
-			if (this.lastBootstrapTime && now - this.lastBootstrapTime < minInterval) return;
-			this.lastBootstrapTime = now;
+        toggleTheme() {
+            this.isDarkTheme = !this.isDarkTheme;
+        },
 
-			try {
-				const params = new URLSearchParams();
-				if (this.lastTransactionUpdate) params.append('last_transaction_update', this.lastTransactionUpdate);
-				if (this.lastCategoryUpdate) params.append('last_category_update', this.lastCategoryUpdate);
+        // --- Bootstrap / delta fetch ---
+        async bootstrap() {
+            const now = Date.now();
+            const minInterval = 1000;
+            if (this.lastBootstrapTime && now - this.lastBootstrapTime < minInterval) return;
+            this.lastBootstrapTime = now;
 
-				const res = await fetch(`/api/bootstrap/?${params.toString()}`);
-				if (!res.ok) throw new Error('Bootstrap failed');
-				const data = await res.json();
+            try {
+                const params = new URLSearchParams();
+                if (this.lastTransactionUpdate) params.append('last_transaction_update', this.lastTransactionUpdate);
+                if (this.lastCategoryUpdate) params.append('last_category_update', this.lastCategoryUpdate);
 
-				const txStore = Alpine.store('transactions');
+                const res = await fetch(`/api/bootstrap/?${params.toString()}`);
+                if (!res.ok) throw new Error('Bootstrap failed');
+                const data = await res.json();
 
-				// --- Transactions ---
-				if (data.transactions?.length > 0) {
-					const existingIds = new Set(txStore.transactions.map(t => t.id));
-					const newTxs = data.transactions.filter(t => !existingIds.has(t.id));
-					txStore.transactions.unshift(...newTxs);
-				}
+                const txStore = Alpine.store('transactions');
 
-				if (data.last_transaction_update) {
-					this.lastTransactionUpdate = data.last_transaction_update;
-				}
+                // --- Transactions ---
+                if (data.transactions?.length > 0) {
+                    const existingIds = new Set(txStore.transactions.map(t => t.id));
+                    const newTxs = data.transactions.filter(t => !existingIds.has(t.id));
+                    txStore.transactions.unshift(...newTxs);
+                }
 
-				// --- Categories ---
-				if (data.categories?.length > 0) {
-					const existingIds = new Set(txStore.categories.map(c => c.id));
-					const newCats = data.categories.filter(c => !existingIds.has(c.id));
-					txStore.categories.push(...newCats);
-				}
+                if (data.last_transaction_update) {
+                    this.lastTransactionUpdate = data.last_transaction_update;
+                }
 
-				if (data.last_category_update) {
-					this.lastCategoryUpdate = data.last_category_update;
-				}
+                // --- Categories ---
+                if (data.categories?.length > 0) {
+                    const existingIds = new Set(txStore.categories.map(c => c.id));
+                    const newCats = data.categories.filter(c => !existingIds.has(c.id));
+                    txStore.categories.push(...newCats);
+                }
 
-				console.log('Bootstrap fetched:', data.transactions.length, 'transactions,', data.categories.length, 'categories');
+                if (data.last_category_update) {
+                    this.lastCategoryUpdate = data.last_category_update;
+                }
 
-			} catch (err) {
-				console.error(err);
-			}
-		},
+                console.log('Bootstrap fetched:', data.transactions.length, 'transactions,', data.categories.length, 'categories');
 
-		async syncIfNeeded() {
-			const now = Date.now();
-			const minInterval = 1000;
-			if (this.lastSyncTime && now - this.lastSyncTime < minInterval) return;
-			this.lastSyncTime = now;
+            } catch (err) {
+                console.error(err);
+            }
+        },
 
-			await this.bootstrap();
-		},
+        async syncIfNeeded() {
+            const now = Date.now();
+            const minInterval = 1000;
+            if (this.lastSyncTime && now - this.lastSyncTime < minInterval) return;
+            this.lastSyncTime = now;
 
-		closeTransactionModal() {
-			this.showTransactionModal = false;
-		},
+            await this.bootstrap();
+        },
 
-		openTransactionModal() {
-			this.showTransactionModal = true;
-		},
+        closeTransactionModal() {
+            this.showTransactionModal = false;
+        },
 
-		get incomeTotal() {
-			return Alpine.store('transactions').transactions
-				.filter(t => t.is_income)
-				.reduce((sum, t) => sum + parseFloat(t.amount), 0);
-		},
+        openTransactionModal() {
+            this.showTransactionModal = true;
+        },
 
-		get expenseTotal() {
-			return Alpine.store('transactions').transactions
-				.filter(t => !t.is_income)
-				.reduce((sum, t) => sum + parseFloat(t.amount), 0);
-		},
+        get incomeTotal() {
+            return Alpine.store('transactions').transactions
+                .filter(t => t.is_income)
+                .reduce((sum, t) => sum + parseFloat(t.amount), 0);
+        },
 
-		get balance() {
-			return this.incomeTotal - this.expenseTotal;
-		},
-	});
+        get expenseTotal() {
+            return Alpine.store('transactions').transactions
+                .filter(t => !t.is_income)
+                .reduce((sum, t) => sum + parseFloat(t.amount), 0);
+        },
+
+        get balance() {
+            return this.incomeTotal - this.expenseTotal;
+        },
+    });
 });

@@ -10,14 +10,10 @@
 
 {% block content %}
 {% include "app/modals/add_transaction.html" %}
-<section class="section">
-	<div x-data="transactionApp()" class="container">
+<section class="section" style="margin-bottom: 0 !important; padding-bottom: 0 !important;">
+	<div x-data="transactionApp()" class="container is-max-desktop">
 
 		<div class="transactions-header">
-			<template x-if="$store.app.isMobile" x-cloak>
-				{% include "app/components/dashboard/transaction_filters.html" %}
-			</template>
-
 			<!-- Left: Add Transaction -->
 			<button class="button is-primary is-normal" @click="$store.app.openTransactionModal()">Add Transaction</button>
 
@@ -32,16 +28,8 @@
 				</div>
 			</div>
 		</div>
-
 <!--		<hr style="margin-top: .6rem !important; margin-bottom: 0 !important;">-->
-
-
 		{% include "app/components/dashboard/transaction_table.html" %}
-
-		<!-- Chart -->
-		<div x-data="chartApp()" style="max-width: 300px; margin: 2rem auto;">
-			<canvas id="summaryChart"></canvas>
-		</div>
 	</div>
 </section>
 

@@ -1,162 +1,83 @@
-<!-- Transactions Table -->
-<template x-if="!$store.app.isMobile">
-	<table class="transactions-table table is-striped is-hoverable" style="margin-top: 1rem !important;">
-		<thead>
-		<tr class="transaction-table-header">
-			<th class="col-date" @click="toggleSort('date')">Date
-				<template x-if="sort.direction">
-				<span x-show="sort.column === 'date'">
-				    <span x-show="sort.direction === 'asc'">↑</span>
-				    <span x-show="sort.direction === 'desc'">↓</span>
-				</span>
-				</template>
-			</th>
-			<th class="col-description" @click="toggleSort('description')">Description
-				<template x-if="sort.direction">
-				<span x-show="sort.column === 'description'">
-				    <span x-show="sort.direction === 'asc'">↑</span>
-				    <span x-show="sort.direction === 'desc'">↓</span>
-				</span>
-				</template>
-			</th>
-			<th class="col-category" @click="toggleSort('category')">
-				<template x-if="sort.direction">
-					<span x-show="sort.column === 'category'">
-				    <span x-show="sort.direction === 'asc'">↑</span>
-				    <span x-show="sort.direction === 'desc'">↓</span>
-				</span>
-				</template>
-				Category
-			</th>
-			<!--		<th class="col-type" @click="toggleSort('type')">Type-->
-			<!--			<template x-if="sort.direction">-->
-			<!--				<span x-show="sort.column === 'type'">-->
-			<!--				    <span x-show="sort.direction === 'asc'">↑</span>-->
-			<!--				    <span x-show="sort.direction === 'desc'">↓</span>-->
-			<!--				</span>-->
-			<!--			</template>-->
-			<!--		</th>-->
-			<th class="col-amount" @click="toggleSort('amount')">
-				<template x-if="sort.direction">
-					<span x-show="sort.column === 'amount'">
-				    <span x-show="sort.direction === 'asc'">↑</span>
-				    <span x-show="sort.direction === 'desc'">↓</span>
-				</span>
-				</template>
-				Amount
-			</th>
-		</tr>
-		</thead>
-
-		<tbody>
-		<template x-for="t in paginatedTransactions" :key="t.id">
-			<tr>
-				<td class="col-date" data-label="Date" x-html="(() => {
-					    const d = new Date(t.date);
-					    const day = String(d.getDate()).padStart(2,'0');
-					    const month = String(d.getMonth()+1).padStart(2,'0');
-					    const yearFull = d.getFullYear();
-					    const yearShort = String(yearFull).slice(-2); // last 2 digits
-					    const hours = String(d.getHours()).padStart(2,'0');
-					    const minutes = String(d.getMinutes()).padStart(2,'0');
-					    // Check screen width
-              const isMobile = window.innerWidth <= 1300;
-              return `${day}/${month}/${isMobile ? yearShort : yearFull}&nbsp;&nbsp;${hours}:${minutes}`;
-					})()"></td>
-				<td class="col-description" data-label="Description" x-text="t.description"></td>
-				<td class="col-category" data-label="Category">
-					<span class="col-type"
-					      :style="`color: ${t.category?.color || '#888'};`"
-					      x-text="t.category?.name || 'Uncategorized'">
-					</span>
-				</td>
-				<!--			<td class="col-type" data-label="Type"-->
-				<!--			    x-text="t.is_income ? 'Income' : 'Expense'"></td>-->
-				<td class="col-amount" data-label="Amount" colspan="" :class="t.is_income ? 'income' : 'expense'"
-				    x-text="parseFloat(t.amount).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2}) + '&nbsp;&nbsp;PLN'">
-				</td>
-			</tr>
-		</template>
-		</tbody>
-	</table>
-</template>
-
-<!-- Mobile Transactions View -->
-<template x-if="$store.app.isMobile">
-	<div class="transactions-cards">
-		<template x-for="t in paginatedTransactions" :key="t.id">
-			<div class="transaction-card has-background-dark">
-				<div class="top-row">
-					<div class="amount-group">
-						<div class="amount"
-						     x-html="parseFloat(t.amount).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2}) + '&nbsp;PLN'"></div>
-						<div class="type"
-						     :class="t.is_income ? 'income' : 'expense'"
-						     x-text="t.is_income ? 'Income' : 'Expense'"></div>
-					</div>
-					<div class="right-meta">
-						<div class="category"
-						     :style="`color: ${t.category?.color || '#888'}`"
-						     x-text="t.category?.name || 'Uncategorized'"></div>
-						<div class="date"
-						     x-html="(() => {
-							const d = new Date(t.date);
-							const day = String(d.getDate()).padStart(2,'0');
-							const month = String(d.getMonth()+1).padStart(2,'0');
-							const year = String(d.getFullYear()).slice(-2);
-							const hours = String(d.getHours()).padStart(2,'0');
-							const minutes = String(d.getMinutes()).padStart(2,'0');
-							return `${day}/${month}/${year} ${hours}:${minutes}`;
-						})()"></div>
-					</div>
-				</div>
-				<div class="bottom-row">
-					<div class="description" x-text="t.description"></div>
-				</div>
-			</div>
-		</template>
-	</div>
-</template>
-
-<hr style="margin-top: 0;">
-
-<div class="transaction-footer">
-	<!-- Filters for desktop only -->
-	<template x-if="!$store.app.isMobile">
-		{% include "app/components/dashboard/transaction_filters.html" %}
-	</template>
-
-	<!-- Table Pagination -->
-	<nav class="pagination" role="navigation" aria-label="pagination" x-show="totalPages > 1">
-		<!-- Previous button -->
-		<a href="#"
-		   class="pagination-previous"
-		   @click.prevent="goPrevPage"
-		   :disabled="currentPage === 1">&lt;</a>
-
-		<!-- Next button -->
-		<a href="#"
-		   class="pagination-next"
-		   @click.prevent="goNextPage"
-		   :disabled="currentPage === totalPages">&gt;</a>
-
-		<!-- Page numbers -->
-		<ul class="pagination-list" style="margin-right: 0.5rem;">
-			<template x-for="(p, i) in visiblePages" :key="i">
-				<li>
-					<template x-if="p === '...'">
-						<span class="pagination-ellipsis">&hellip;</span>
-					</template>
-					<template x-if="p !== '...'">
-						<a href="#"
-						   class="pagination-link"
-						   :class="{'is-current': p === currentPage}"
-						   x-text="p"
-						   @click.prevent="currentPage = p"></a>
-					</template>
-				</li>
+<section class="transactions-section">
+	<div class="container">
+		<!-- Filters + Pagination (always visible) -->
+		<div class="transactions-toolbar">
+			<template x-if="$store.app.isMobile">
+				{% include "app/components/dashboard/transaction_filters.html" %}
 			</template>
-		</ul>
-	</nav>
+		</div>
 
-</div>
+		<!-- Skeletons -->
+		<div class="transactions-grid tx-skeleton" x-show="isLoading" x-transition.opacity>
+			<template x-for="i in pageSize" :key="`skeleton-${i}`">
+				<div class="card tx-card">
+					<div class="card-content p-3">
+						<div class="level is-mobile">
+							<div class="level-left tx-card__left" style="flex: 1;">
+								<div class="skeleton-line is-skeleton"
+								     style="width: 30%; height: 0.8rem; margin-bottom: 0.5rem;"></div>
+								<div class="skeleton-line is-skeleton" style="width: 75%; height: 1rem;"></div>
+							</div>
+							<div class="level-right tx-card__right" style="min-width: 9rem;">
+								<div class="skeleton-line is-skeleton" style="width: 5.5rem; height: 1.2rem;"></div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</template>
+		</div>
+
+		<!-- Real content -->
+		<div class="transactions-grid" x-show="!isLoading" x-transition.opacity>
+			<!-- No transactions message -->
+			<template x-if="paginatedTransactions.length === 0">
+				<div class="notification tx-card" style="font-size:1.06rem;display:flex; align-items:center; justify-content:center;">
+					No transactions found.
+				</div>
+			</template>
+
+			<!-- Transaction cards -->
+			<template x-for="t in paginatedTransactions" :key="t.id">
+				<div class="card mb-3 tx-card">
+					<div class="card-content p-4">
+						<div class="media">
+							<!-- Left: Date + Description -->
+							<div class="media-content">
+								<div class="tx-card__meta has-text-grey" x-text="formatDate(t.date)"></div>
+								<div class="tx-card__title" x-text="t.description || '(No description)'"
+								     style="white-space: pre-line;"></div>
+							</div>
+
+							<!-- Right: Amount + Category -->
+							<div class="media-right"
+							     style="display:flex; flex-direction:column; align-items:flex-end; gap:0.25rem;">
+								<p class="is-size-6 has-text-weight-semibold"
+								   :class="t.is_income ? 'has-text-success' : 'has-text-danger'"
+								   x-text="formatAmount(t.amount, t.currency || 'PLN')"></p>
+
+								<!-- Category tag with category's color -->
+								<span class="tag"
+								      :style="`
+               color: ${$store.app.isDarkTheme ? '#fff' : '#000'};
+               border: 1px solid ${t.category?.color || '#888'};`"
+								      x-text="t.category?.name || 'Uncategorized'">
+                                </span>
+							</div>
+						</div>
+					</div>
+				</div>
+			</template>
+
+			<!-- Invisible fillers (only if there are transactions and fillerCount > 0) -->
+			<template x-for="i in fillerCount" :key="`filler-${i}`">
+    <div class="card tx-card tx-card--filler is-invisible"></div>
+</template>
+		</div>
+
+		<div class="transactions-toolbar">
+			<template x-if="!$store.app.isMobile">
+				{% include "app/components/dashboard/transaction_filters.html" %}
+			</template>
+		</div>
+	</div>
+</section>
