@@ -59,7 +59,7 @@
 }
 
 .tx-card__title {
-    /*font-weight: 500;*/
+    font-weight: 500 !important;
     /*font-size: 1rem;*/
     white-space: pre-line;
     line-height: 1.3;

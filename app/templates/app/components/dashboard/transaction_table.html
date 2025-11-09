@@ -64,7 +64,7 @@
 							<div class="media">
 								<div class="media-content">
 									<div class="tx-card__meta has-text-grey" x-text="formatDate(t.date)"></div>
-									<div class="tx-card__title" x-text="t.description || '(No description)'"
+									<div class="tx-card__title" x-text="t.description || 'No description'"
 									     style="white-space: pre-line;"></div>
 								</div>
 								<div class="media-right"
@@ -95,7 +95,7 @@
 							     x-text="formatCompactDate(t.date)"
 							></div>
 
-							<div class="tx-card__title" x-text="t.description || '(No description)'"
+							<div class="tx-card__title" x-text="t.description || 'No description'"
 							     style="flex:1 1 auto; min-width:0; overflow:hidden; text-overflow:ellipsis;"></div>
 							<span class="tag is-clickable is-unselectable"
 							      :style="`color: ${$store.app.isDarkTheme ? '#fff' : '#000'}; border: 1px solid ${t.category?.color || '#888'}; flex:0 0 auto;`"

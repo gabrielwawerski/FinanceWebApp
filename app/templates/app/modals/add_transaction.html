@@ -10,7 +10,8 @@
 
 	<div class="modal-background"></div>
 
-	<div class="modal-card" @click.away="if (!isSubmitting && !$store.app.showCategoryModal) $store.app.closeTransactionModal()">
+	<div class="modal-card"
+	     @click.away="if (!isSubmitting && !$store.app.showCategoryModal) $store.app.closeTransactionModal()">
 		<header class="modal-card-head">
 			<p class="modal-card-title">New Transaction</p>
 			<button class="delete"
@@ -20,7 +21,8 @@
 		</header>
 
 		<section class="modal-card-body">
-			<form @submit.prevent="addTransaction">
+			<form id="form" @submit.prevent="addTransaction">
+
 				<!-- Amount -->
 				<div class="field">
 					<label class="label">Amount</label>
@@ -41,33 +43,32 @@
 						<input class="input"
 						       type="text"
 						       x-model="transactionDescription"
-						       placeholder="e.g., Grocery shopping"
-						       required>
+						       placeholder="e.g., Grocery shopping">
 					</div>
 				</div>
 
 				<div class="field-category">
 					<div class="field-body">
 						<!-- Type: Income / Expense -->
-<div class="field">
-                <label class="label">Type</label>
-                <div class="control">
-                    <div class="buttons has-addons">
-                        <button type="button"
-                                class="button"
-                                :class="{ 'is-success is-selected': isIncome }"
-                                @click="toggleIncome()">
-                            <span>Income</span>
-                        </button>
-                        <button type="button"
-                                class="button"
-                                :class="{ 'is-danger is-selected': !isIncome }"
-                                @click="toggleExpense()">
-                            <span>Expense</span>
-                        </button>
-                    </div>
-                </div>
-            </div>
+						<div class="field">
+							<label class="label">Type</label>
+							<div class="control">
+								<div class="buttons has-addons">
+									<button type="button"
+									        class="button"
+									        :class="{ 'is-success is-selected': isIncome }"
+									        @click="toggleIncome()">
+										<span>Income</span>
+									</button>
+									<button type="button"
+									        class="button"
+									        :class="{ 'is-danger is-selected': !isIncome }"
+									        @click="toggleExpense()">
+										<span>Expense</span>
+									</button>
+								</div>
+							</div>
+						</div>
 
 						<!-- Category -->
 						<div class="field">
@@ -92,7 +93,7 @@
 								<div class="control">
 									<button type="button"
 									        class="button is-disabled"
-									        disabled="true"
+									        disabled="disabled"
 									        @click="$store.app.openCategoryModal()">
 										New
 									</button>
@@ -104,10 +105,11 @@
 			</form>
 		</section>
 
-		<footer class="modal-card-foot" style="justify-content: flex-end;">
+		<footer class="modal-card-foot" style="justify-content: flex-end;gap: 0.5rem;">
 			<button class="button is-success"
+			        form="form"
 			        type="submit"
-			        @click="addTransaction()"
+			        @click="addTransaction"
 			        :aria-busy="isSubmitting"
 			        :disabled="isSubmitting">
 				<span x-show="!isSubmitting">Save</span>

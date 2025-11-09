@@ -33,11 +33,11 @@ function transactionModalApp() {
         },
 
         async addTransaction() {
-            if (!this.transactionDescription || !this.transactionAmount || !this.selectedCategoryId) return;  // Basic validation
+            if (!this.transactionAmount || !this.selectedCategoryId) return;  // Basic validation
 
             this.isSubmitting = true;
             const payload = {
-                description: this.transactionDescription,
+                description: this.transactionDescription?.trim() || '',
                 amount: this.transactionAmount,
                 is_income: this.isIncome,
                 category_id: this.selectedCategoryId
