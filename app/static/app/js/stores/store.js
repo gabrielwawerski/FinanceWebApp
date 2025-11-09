@@ -1,12 +1,12 @@
 document.addEventListener('alpine:init', () => {
     Alpine.store('app', {
         isMobile: window.innerWidth <= 767,
-        isDarkTheme: Alpine.$persist(true).as('isDarkTheme'),
+        isDarkTheme: safePersist(true, 'isDarkTheme'),
 
-        lastBootstrapTime: Alpine.$persist(null).as('lastBootstrapTime'),
-        lastSyncTime: Alpine.$persist(null).as('lastSyncTime'),
-        lastTransactionUpdate: Alpine.$persist(null).as('lastTransactionUpdate'),
-        lastCategoryUpdate: Alpine.$persist(null).as('lastCategoryUpdate'),
+        lastBootstrapTime: safePersist(null, 'lastBootstrapTime'),
+        lastSyncTime: safePersist(null, 'lastSyncTime'),
+        lastTransactionUpdate: safePersist(null, 'lastTransactionUpdate'),
+        lastCategoryUpdate: safePersist(null, 'lastCategoryUpdate'),
 
         showTransactionModal: false,
 
@@ -24,7 +24,7 @@ document.addEventListener('alpine:init', () => {
             };
 
             // Add throttled resize listener
-			window.addEventListener('resize', throttle(() => this.updateIsMobile(), 200));
+            window.addEventListener('resize', throttle(() => this.updateIsMobile(), 200));
 
             let focusTimeout;
             window.addEventListener('focus', () => {

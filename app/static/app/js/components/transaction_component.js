@@ -3,7 +3,7 @@ function transactionApp() {
         // --- UI state ---
         isLoading: true,
         currentPage: 1,
-        pageSize: Alpine.$persist(Number(5)),         // default 5
+        pageSize: safePersist(5, 'pageSize'),
 
         // --- Filters (unified) ---
         filters: {

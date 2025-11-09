@@ -9,7 +9,7 @@
 
 		<!-- Skeletons -->
 		<div class="transactions-grid tx-skeleton"
-		     x-show="isLoading && transactions.length > 0"
+		     x-show="isLoading && transactions?.length > 0"
 		     x-transition.opacity>
 			<template x-for="i in pageSize" :key="`skeleton-${i}`">
 				<div class="card tx-card">
@@ -57,11 +57,16 @@
 							<div class="media-right"
 							     style="display:flex; flex-direction:column; align-items:flex-end; gap:0.25rem;">
 								<!-- Category tag with category's color -->
-								<span class="tag"
+								<span class="tag is-clickable"
 								      :style="`
                color: ${$store.app.isDarkTheme ? '#fff' : '#000'};
                border: 1px solid ${t.category?.color || '#888'};`"
-								      x-text="t.category?.name || 'Uncategorized'">
+								      x-text="t.category?.name || 'Uncategorized'"
+								@click="
+	filters.category = (filters.category === (t.category?.id || ''))
+		? ''
+		: (t.category?.id || '');
+">
                                 </span>
 
 								<p class="is-size-6 has-text-weight-semibold"

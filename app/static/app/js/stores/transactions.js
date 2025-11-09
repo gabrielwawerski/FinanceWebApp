@@ -1,7 +1,7 @@
 document.addEventListener('alpine:init', () => {
 	Alpine.store('transactions', {
-		transactions: Alpine.$persist([]).as('transactions'),
-		categories: Alpine.$persist([]).as('categories'),
+		transactions: safePersist([], 'transactions'),
+		categories: safePersist([], 'categories'),
 
 		getApiHeaders() {
 			return {
