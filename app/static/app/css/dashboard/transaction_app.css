@@ -104,7 +104,7 @@
 .tag {
     background-color: rgba(0, 0, 0, 0.05);
     border: 1px solid currentColor;
-    flex:0 0 auto;
+    flex: 0 0 auto;
     text-overflow: ellipsis;
 }
 
@@ -178,21 +178,21 @@
 }
 
 .tx-card--filler.is-invisible {
-	visibility: hidden !important;
-	margin-bottom: 0.75rem !important;
-	display: block;
-	border: none !important;
-	box-shadow: none !important;
-	background: transparent !important;
+    visibility: hidden !important;
+    margin-bottom: 0.75rem !important;
+    display: block;
+    border: none !important;
+    box-shadow: none !important;
+    background: transparent !important;
 }
 
 /* Default (non-compact) mode height */
 .tx-card--filler.is-invisible.is-default {
-	height: 68px !important;
+    height: 68px !important;
 }
 
 .tx-card--filler.is-invisible.is-compact {
-	height: 40px !important;
+    height: 40px !important;
 }
 
 .balance-container {
