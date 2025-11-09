@@ -32,6 +32,28 @@
 	-ms-user-select: none;
 }
 
+.navbar-item .icon {
+	width: 1.25rem;
+	height: 1.25rem;
+	stroke-width: 2;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+
+/* Subtle hover feedback */
+.navbar-item:hover .icon {
+	transform: scale(1.1);
+	transition: transform 0.15s ease;
+}
+
+/* Adjust icon color for theme */
+[data-theme="dark"] .navbar-item .icon {
+	stroke: #fff;
+}
+[data-theme="light"] .navbar-item .icon {
+	stroke: #222;
+}
 /* Buttons */
 .button.is-primary {
 	color: white;

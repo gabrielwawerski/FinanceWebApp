@@ -47,8 +47,8 @@ function transactionApp() {
         },
 
         get displayedCount() {
-    return Math.max(1, this.paginatedTransactions.length); // count "No transactions found." as 1
-},
+            return Math.max(1, this.paginatedTransactions.length); // count "No transactions found." as 1
+        },
 
         get filteredCategories() {
             if (!this.filters.type) return this.categories; // show all if no type selected
@@ -65,15 +65,15 @@ function transactionApp() {
             return this.filteredTransactions.slice(start, start + this.pageSize);
         },
 
-get fillerCount() {
-    const count = this.displayedCount;
-    return count < this.pageSize ? this.pageSize - count : 0;
-},
+        get fillerCount() {
+            const count = this.displayedCount;
+            return count < this.pageSize ? this.pageSize - count : 0;
+        },
 
         // --- Actions / pagination ---
         setPageSize(size) {
-			this.pageSize = Number(size) || 5; // automatically persisted
-		},
+            this.pageSize = Number(size) || 5; // automatically persisted
+        },
         goToPage(page) {
             const p = Math.min(Math.max(1, page), this.totalPages);
             if (p !== this.currentPage) this.currentPage = p;

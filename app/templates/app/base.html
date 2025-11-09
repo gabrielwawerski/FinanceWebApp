@@ -19,7 +19,8 @@
 <nav class="navbar is-transparent" role="navigation" aria-label="main navigation" x-data="{ open: false }">
 	<div class="container is-max-desktop">
 		<div class="navbar-brand">
-			<a class="navbar-item has-text-weight-semibold" href="{% url 'dashboard' %}" @click="open = false">Dashboard</a>
+			<a class="navbar-item has-text-weight-semibold" href="{% url 'dashboard' %}"
+			   @click="open = false">Dashboard</a>
 			<!-- Mobile burger menu -->
 			<a role="button" class="navbar-burger" aria-label="menu" aria-expanded="false"
 			   :class="{ 'is-active': open }"
@@ -33,18 +34,57 @@
 
 		<div id="main-navbar" class="navbar-menu" :class="{ 'is-active': open }">
 			<div class="navbar-start">
-<!--				<a class="navbar-item" href="#">Transactions</a>-->
-<!--				<a class="navbar-item" href="#">Obligations</a>-->
-<!--				<a class="navbar-item" href="#">Crypto</a>-->
+				<!--				<a class="navbar-item" href="#">Transactions</a>-->
+				<!--				<a class="navbar-item" href="#">Obligations</a>-->
+				<!--				<a class="navbar-item" href="#">Crypto</a>-->
 			</div>
 
-			<div class="navbar-end">
+			<div class="navbar-end" style="gap: 0.5rem;">
 				{% if user.is_authenticated %}
 				<!-- Theme toggle using store helper -->
-				<a class="navbar-item" @click="$store.app.toggleTheme(); open = false;">Theme</a>
+				<a
+						class="navbar-item"
+						@click="$store.app.toggleTheme();"
+						title="Toggle theme"
+						aria-label="Toggle theme"
+				>
+					<!-- Moon -->
+					<template x-if="!$store.app.isDarkTheme">
+						<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" stroke="currentColor"
+						     stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+						     class="feather feather-moon"
+							 style="transform:translateY(2px);">
+							<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+						</svg>
+					</template>
 
-				<a x-data @click="$refs.logoutForm.submit(); open = false" class="navbar-item is-light is-outlined">
-					Logout
+					<!-- Sun -->
+					<template x-if="$store.app.isDarkTheme">
+						<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" stroke="currentColor"
+						     stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+						     class="feather feather-sun"
+						     style="transform:translateY(2px);">
+							<circle cx="12" cy="12" r="5"/>
+							<line x1="12" y1="1" x2="12" y2="3"/>
+							<line x1="12" y1="21" x2="12" y2="23"/>
+							<line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/>
+							<line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+							<line x1="1" y1="12" x2="3" y2="12"/>
+							<line x1="21" y1="12" x2="23" y2="12"/>
+							<line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/>
+							<line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+						</svg>
+					</template>
+				</a>
+
+				<a x-data @click="$refs.logoutForm.submit();" class="navbar-item" title="Logout" aria-label="Logout">
+					<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="none" stroke="currentColor"
+					     stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+					     class="feather feather-log-out">
+						<path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+						<polyline points="16 17 21 12 16 7"/>
+						<line x1="21" y1="12" x2="9" y2="12"/>
+					</svg>
 				</a>
 
 				<!-- Hidden logout form -->
@@ -81,13 +121,14 @@
 <!-- Load stores -->
 
 
-<script src="{% static 'app/js/stores/store.js' %}" ></script>
+<script src="{% static 'app/js/stores/store.js' %}"></script>
 <script src="{% static 'app/js/stores/transactions.js' %}"></script>
+<script src="{% static 'app/js/stores/settings.js' %}"></script>
 
-<script src="{% static 'app/js/components/category_component.js' %}" ></script>
-<script src="{% static 'app/js/components/transaction_component.js' %}" ></script>
-<script src="{% static 'app/js/components/transaction_modal_component.js' %}" ></script>
-<script src="{% static 'app/js/components/chart_component.js' %}" ></script>
+<script src="{% static 'app/js/components/category_component.js' %}"></script>
+<script src="{% static 'app/js/components/transaction_component.js' %}"></script>
+<script src="{% static 'app/js/components/transaction_modal_component.js' %}"></script>
+<script src="{% static 'app/js/components/chart_component.js' %}"></script>
 {% block extra_js %}{% endblock %}
 </body>
 </html>

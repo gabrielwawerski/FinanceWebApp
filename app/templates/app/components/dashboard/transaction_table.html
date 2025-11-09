@@ -5,6 +5,7 @@
 			<template x-if="$store.app.isMobile">
 				{% include "app/components/dashboard/transaction_filters.html" %}
 			</template>
+
 		</div>
 
 		<!-- Skeletons -->
@@ -12,7 +13,9 @@
 		     x-show="isLoading && ($store.transactions.transactions?.length ?? 0) > 0"
 		     x-transition.opacity>
 			<template x-for="i in pageSize" :key="`skeleton-${i}`">
-				<div class="card tx-card">
+				<div class="card tx-card mb-2"
+				     :class="{'is-compact': $store.settings.isCompactMode,
+						'is-default': !$store.settings.isCompactMode}">
 					<div class="card-content p-4">
 						<div class="level media">
 							<div class="level-left tx-card__left" style="flex: 1;">
@@ -42,45 +45,77 @@
 			</template>
 
 			<!-- Transaction cards -->
+			<!-- Transaction cards -->
 			<template x-for="t in paginatedTransactions" :key="t.id">
-				<div class="card mb-3 tx-card">
-					<div class="card-content p-4">
-						<div class="media">
-							<!-- Left: Date + Description -->
-							<div class="media-content">
-								<div class="tx-card__meta has-text-grey" x-text="formatDate(t.date)"></div>
-								<div class="tx-card__title" x-text="t.description || '(No description)'"
-								     style="white-space: pre-line;"></div>
-							</div>
+				<div class="card tx-card mb-2"
+				     :class="$store.settings.isCompactMode ? ' mb-1' : ''"
+				     :style="$store.settings.isCompactMode
+            ? 'display:flex; align-items:center; justify-content:space-between; gap:0.75rem; transition: all 0.3s ease; min-height: 40px; overflow:hidden; font-size:0.8rem;'
+            : 'transition: all 0.3s ease; max-height:200px; font-size:inherit;'">
 
-							<!-- Right: Amount + Category -->
-							<div class="media-right"
-							     style="display:flex; flex-direction:column; align-items:flex-end; gap:0.25rem;">
-								<!-- Category tag with category's color -->
-								<span class="tag is-clickable"
-								      :style="`
-               color: ${$store.app.isDarkTheme ? '#fff' : '#000'};
-               border: 1px solid ${t.category?.color || '#888'};`"
-								      x-text="t.category?.name || 'Uncategorized'"
-								@click="
-	filters.category = (filters.category === (t.category?.id || ''))
-		? ''
-		: (t.category?.id || '');
-">
-                                </span>
-
-								<p class="is-size-6 has-text-weight-semibold"
-								   :class="t.is_income ? 'has-text-success' : 'has-text-danger'"
-								   x-text="formatAmount(t.amount, t.currency || 'PLN')"></p>
+					<template x-if="!$store.settings.isCompactMode">
+						<!-- Default view -->
+						<div class="card-content p-4">
+							<div class="media">
+								<div class="media-content">
+									<div class="tx-card__meta has-text-grey" x-text="formatDate(t.date)"></div>
+									<div class="tx-card__title" x-text="t.description || '(No description)'"
+									     style="white-space: pre-line;"></div>
+								</div>
+								<div class="media-right"
+								     style="display:flex; flex-direction:column; align-items:flex-end; gap:0.25rem;">
+                        <span class="tag is-clickable is-unselectable"
+                              :style="`color: ${$store.app.isDarkTheme ? '#fff' : '#000'}; border: 1px solid ${t.category?.color || '#888'};`"
+                              x-text="t.category?.name || 'Uncategorized'"
+                              @click="
+          if (filters.category === String(t.category?.id)) {
+              clearFilters();
+          } else {
+              filters.category = String(t.category?.id);
+          }
+      ">
+                        </span>
+									<p class="is-size-6 has-text-weight-semibold"
+									   :class="t.is_income ? 'has-text-success' : 'has-text-danger'"
+									   x-text="formatAmount(t.amount, t.currency || 'PLN')"></p>
+								</div>
 							</div>
 						</div>
-					</div>
+					</template>
+
+					<template x-if="$store.settings.isCompactMode">
+						<!-- Compact inline view -->
+						<div class="card-content-" style="display:flex; align-items:center; gap:0.75rem; width:100%;">
+							<div class="tx-card__meta has-text-grey" x-text="formatDate(t.date)"
+							     style="flex:0 0 auto;"></div>
+							<div class="tx-card__title" x-text="t.description || '(No description)'"
+							     style="flex:1 1 auto; min-width:0; overflow:hidden; text-overflow:ellipsis;"></div>
+							<span class="tag is-clickable is-unselectable"
+							      :style="`color: ${$store.app.isDarkTheme ? '#fff' : '#000'}; border: 1px solid ${t.category?.color || '#888'}; flex:0 0 auto;`"
+							      x-text="t.category?.name || 'Uncategorized'"
+							      @click="
+          if (filters.category === String(t.category?.id)) {
+              clearFilters();
+          } else {
+              filters.category = String(t.category?.id);
+          }
+      ">
+                </span>
+							<p class="is-size-6 has-text-weight-semibold"
+							   :class="t.is_income ? 'has-text-success' : 'has-text-danger'"
+							   x-text="formatAmount(t.amount, t.currency || 'PLN')"
+							   style="flex:0 0 auto;"></p>
+						</div>
+					</template>
 				</div>
 			</template>
 
+
 			<!-- Invisible fillers (only if there are transactions and fillerCount > 0) -->
-			<template x-for="i in fillerCount" :key="`filler-${i}`">
-				<div class="card tx-card tx-card--filler is-invisible"></div>
+			<template x-for="i in fillerCount" :key="`filler-${i}-${$store.settings.isCompactMode}`">
+				<div class="card tx-card tx-card--filler is-invisible"
+				     :class="{'is-compact': $store.settings.isCompactMode,
+                  'is-default': !$store.settings.isCompactMode}"></div>
 			</template>
 		</div>
 

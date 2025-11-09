@@ -32,7 +32,10 @@ document.addEventListener('alpine:init', () => {
                 focusTimeout = setTimeout(() => this.syncIfNeeded(), 1500);
             });
 
-            this.bootstrap();
+            	// Run bootstrap only on the homepage
+	if (window.location.pathname === '/') {
+		this.bootstrap();
+	}
         },
 
         updateIsMobile() {
@@ -44,54 +47,57 @@ document.addEventListener('alpine:init', () => {
         },
 
         // --- Bootstrap / delta fetch ---
-        async bootstrap() {
-	const now = Date.now();
-	const minInterval = 1000;
-	if (this.lastBootstrapTime && now - this.lastBootstrapTime < minInterval) return;
-	this.lastBootstrapTime = now;
-
-	try {
-		const params = new URLSearchParams();
-		if (this.lastTransactionUpdate) params.append('last_transaction_update', this.lastTransactionUpdate);
-		if (this.lastCategoryUpdate) params.append('last_category_update', this.lastCategoryUpdate);
-
-		const res = await fetch(`/api/bootstrap/?${params.toString()}`);
-		if (!res.ok) throw new Error('Bootstrap failed');
-		const data = await res.json();
-
-		const txStore = Alpine.store('transactions');
-
-		// --- Transactions ---
-		if (Array.isArray(data.transactions) && data.transactions.length > 0) {
-			const existingIds = new Set(txStore.transactions.map(t => t.id));
-			const newTxs = data.transactions.filter(t => !existingIds.has(t.id));
-			if (newTxs.length > 0) txStore.transactions.unshift(...newTxs);
-			if (data.last_transaction_update) this.lastTransactionUpdate = data.last_transaction_update;
-		}
-
-		// --- Categories ---
-		if (Array.isArray(data.categories) && data.categories.length > 0) {
-			const existingIds = new Set(txStore.categories.map(c => c.id));
-			const newCats = data.categories.filter(c => !existingIds.has(c.id));
-			if (newCats.length > 0) txStore.categories.push(...newCats);
-			if (data.last_category_update) this.lastCategoryUpdate = data.last_category_update;
-		}
-
-		console.log('Bootstrap fetched:', data.transactions?.length ?? 0, 'transactions,', data.categories?.length ?? 0, 'categories');
-
-	} catch (err) {
-		console.error(err);
-	}
-},
-
-        async syncIfNeeded() {
+        async bootstrap(firstBoot = false) {
             const now = Date.now();
             const minInterval = 1000;
-            if (this.lastSyncTime && now - this.lastSyncTime < minInterval) return;
-            this.lastSyncTime = now;
+            if (this.lastBootstrapTime && now - this.lastBootstrapTime < minInterval) return;
+            this.lastBootstrapTime = now;
 
-            await this.bootstrap();
+            try {
+                const params = new URLSearchParams();
+                if (this.lastTransactionUpdate) params.append('last_transaction_update', this.lastTransactionUpdate);
+                if (this.lastCategoryUpdate) params.append('last_category_update', this.lastCategoryUpdate);
+
+                const res = await fetch(`/api/bootstrap/?${params.toString()}`);
+                if (!res.ok) throw new Error('Bootstrap failed');
+                const data = await res.json();
+
+                const txStore = Alpine.store('transactions');
+
+                // --- Transactions ---
+                if (Array.isArray(data.transactions) && data.transactions.length > 0) {
+                    const existingIds = new Set(txStore.transactions.map(t => t.id));
+                    const newTxs = data.transactions.filter(t => !existingIds.has(t.id));
+                    if (newTxs.length > 0) txStore.transactions.unshift(...newTxs);
+                    if (data.last_transaction_update) this.lastTransactionUpdate = data.last_transaction_update;
+                }
+
+                // --- Categories ---
+                if (Array.isArray(data.categories) && data.categories.length > 0) {
+                    const existingIds = new Set(txStore.categories.map(c => c.id));
+                    const newCats = data.categories.filter(c => !existingIds.has(c.id));
+                    if (newCats.length > 0) txStore.categories.push(...newCats);
+                    if (data.last_category_update) this.lastCategoryUpdate = data.last_category_update;
+                }
+
+                console.log('Bootstrap fetched:', data.transactions?.length ?? 0, 'transactions,', data.categories?.length ?? 0, 'categories');
+
+            } catch (err) {
+                console.error(err);
+            }
         },
+
+async syncIfNeeded() {
+	// Skip sync if not on homepage
+	if (window.location.pathname !== '/') return;
+
+	const now = Date.now();
+	const minInterval = 1000;
+	if (this.lastSyncTime && now - this.lastSyncTime < minInterval) return;
+	this.lastSyncTime = now;
+
+	await this.bootstrap();
+},
 
         closeTransactionModal() {
             this.showTransactionModal = false;
