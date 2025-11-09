@@ -52,11 +52,13 @@
 
 			<!-- Transaction cards -->
 			<template x-for="t in paginatedTransactions" :key="t.id">
-				<div class="card tx-card"
-				     :class="$store.settings.isCompactMode ? 'mb-1' : 'mb-2'"
-				     :style="$store.settings.isCompactMode
-            ? 'display:flex; align-items:center; justify-content:space-between; gap:0.75rem; transition: all 0.3s ease; min-height: 40px; overflow:hidden; font-size:0.8rem;'
-            : 'transition: all 0.3s ease; max-height:200px; font-size:inherit;'">
+	<div class="card tx-card"
+	     @mouseenter="t.isHovered = true"
+	     @mouseleave="t.isHovered = false"
+	     :class="$store.settings.isCompactMode ? 'mb-1' : 'mb-2'"
+	     :style="$store.settings.isCompactMode
+          ? 'display:flex; align-items:center; justify-content:space-between; gap:0.75rem; transition: all 0.3s ease; min-height: 40px; overflow:hidden; font-size:0.8rem;'
+          : 'transition: all 0.3s ease; max-height:200px; font-size:inherit;'">
 
 					<template x-if="!$store.settings.isCompactMode">
 						<!-- Default view -->
@@ -70,16 +72,21 @@
 								<div class="media-right"
 								     style="display:flex; flex-direction:column; align-items:flex-end;">
                         <span class="tag is-clickable is-unselectable"
-                              :style="`color: ${$store.app.isDarkTheme ? '#fff' : '#000'}; border: 1px solid ${t.category?.color || '#888'};`"
-                              x-text="t.category?.name || 'Uncategorized'"
-                              @click="
-								if (filters.category === String(t.category?.id)) {
-                                    clearFilters();
-								} else {
-                                    filters.category = String(t.category?.id);
-								}
-                              ">
-                        </span>
+		      :style="`
+		      	color: ${$store.app.isDarkTheme ? '#fff' : '#000'};
+		      	border: 1px solid ${t.category?.color || '#888'};
+		      	background-color: ${t.isHovered ? t.category?.color || '#ccc' : 'transparent'};
+		      	transition: background-color 0.2s;
+		      `"
+		      x-text="t.category?.name || 'Uncategorized'"
+		      @click="
+				if (filters.category === String(t.category?.id)) {
+					clearFilters();
+				} else {
+					filters.category = String(t.category?.id);
+				}
+		      ">
+		</span>
 									<p class="has-text-weight-semibold"
 									   :class="t.is_income ? 'has-text-success' : 'has-text-danger'"
 									   x-text="formatAmount(t.amount, t.currency || 'PLN')"></p>
@@ -98,16 +105,21 @@
 							<div class="tx-card__title" x-text="t.description || 'No description'"
 							     style="flex:1 1 auto; min-width:0; overflow:hidden; text-overflow:ellipsis;"></div>
 							<span class="tag is-clickable is-unselectable"
-							      :style="`color: ${$store.app.isDarkTheme ? '#fff' : '#000'}; border: 1px solid ${t.category?.color || '#888'}; flex:0 0 auto;`"
-							      x-text="t.category?.name || 'Uncategorized'"
-							      @click="
-                                    if (filters.category === String(t.category?.id)) {
-                                        clearFilters();
-                                    } else {
-                                        filters.category = String(t.category?.id);
-                                    }
-                                  ">
-                </span>
+		      :style="`
+		      	color: ${$store.app.isDarkTheme ? '#fff' : '#000'};
+		      	border: 1px solid ${t.category?.color || '#888'};
+		      	background-color: ${t.isHovered ? t.category?.color || '#ccc' : 'transparent'};
+		      	transition: background-color 0.2s;
+		      `"
+		      x-text="t.category?.name || 'Uncategorized'"
+		      @click="
+				if (filters.category === String(t.category?.id)) {
+					clearFilters();
+				} else {
+					filters.category = String(t.category?.id);
+				}
+		      ">
+		</span>
 							<p class="has-text-weight-semibold"
 							   :class="t.is_income ? 'has-text-success' : 'has-text-danger'"
 							   x-text="formatAmount(t.amount, t.currency || 'PLN')"

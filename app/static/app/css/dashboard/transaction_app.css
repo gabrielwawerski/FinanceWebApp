@@ -45,10 +45,19 @@
 }
 
 /* HOVER EFFECT */
-.tx-card:hover {
-    transform: translateY(-1px);
-    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.12), 0 12px 30px rgba(0, 0, 0, 0.08);
+.tx-card {
+	border: 1px solid transparent;
+	color: inherit;
+	background-color: #fff; /* base background */
+	transition: color 0.2s, background-color 0.2s, border 0.2s;
 }
+
+.tx-card:hover {
+	border: 1px solid hsl(204, 86%, 53%);
+	color: hsl(204, 86%, 53%);
+	background-color: hsl(204, 86%, 95%); /* subtle light blue */
+}
+
 
 .tx-card .level {
     width: 100%;
@@ -188,11 +197,11 @@
 
 /* Default (non-compact) mode height */
 .tx-card--filler.is-invisible.is-default {
-    height: 68px !important;
+    height: 70px !important;
 }
 
 .tx-card--filler.is-invisible.is-compact {
-    height: 40px !important;
+    height: 42px !important;
 }
 
 .balance-container {
