@@ -41,7 +41,7 @@
 		</div>
 
 		<!-- Real content -->
-		<div class="transactions-grid" x-show="!isLoading" x-transitio.opacityn>
+		<div class="transactions-grid" x-show="!isLoading" x-transition>
 			<!-- No transactions message -->
 			<template x-if="paginatedTransactions.length === 0">
 				<div class="notification tx-card"
@@ -80,7 +80,7 @@
 								}
                               ">
                         </span>
-									<p class="is-size-6 has-text-weight-semibold"
+									<p class="has-text-weight-semibold"
 									   :class="t.is_income ? 'has-text-success' : 'has-text-danger'"
 									   x-text="formatAmount(t.amount, t.currency || 'PLN')"></p>
 								</div>
@@ -108,10 +108,10 @@
                                     }
                                   ">
                 </span>
-							<p class="is-size-6 has-text-weight-semibold"
+							<p class="has-text-weight-semibold"
 							   :class="t.is_income ? 'has-text-success' : 'has-text-danger'"
 							   x-text="formatAmount(t.amount, t.currency || 'PLN')"
-							   style="flex:0 0 auto;"></p>
+							   style="display: flex; justify-content:flex-end;flex:0 0 auto;min-width: 120px;"></p>
 						</div>
 					</template>
 				</div>
