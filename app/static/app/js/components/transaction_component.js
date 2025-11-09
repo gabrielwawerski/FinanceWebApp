@@ -1,7 +1,6 @@
 function transactionApp() {
     return {
         // --- UI state ---
-        isLoading: true,
         currentPage: 1,
         pageSize: safePersist(5, 'pageSize'),
 
@@ -170,9 +169,9 @@ function transactionApp() {
 
             // --- Fetch data if needed ---
             if ((store?.transactions || []).length > 0) {
-                this.isLoading = false;
+                Alpine.store('app').setLoading(false);
             } else {
-                this.isLoading = true;
+                Alpine.store('app').setLoading(true);
                 try {
                     if (hasFetch) {
                         await store.fetchTransactions();
@@ -183,7 +182,7 @@ function transactionApp() {
                         await new Promise(r => setTimeout(r, 300));
                     }
                 } finally {
-                    requestAnimationFrame(() => this.isLoading = false);
+                    requestAnimationFrame(() => Alpine.store('app').setLoading(false));
                 }
             }
 

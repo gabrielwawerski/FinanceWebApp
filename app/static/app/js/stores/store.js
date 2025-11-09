@@ -10,6 +10,12 @@ document.addEventListener('alpine:init', () => {
 
         showTransactionModal: false,
 
+        isLoading: Alpine.reactive(false),
+
+		setLoading(isLoading) {
+			this.isLoading = isLoading;
+		},
+
         init() {
             this.updateIsMobile();
             const throttle = (fn, limit) => {
@@ -32,10 +38,10 @@ document.addEventListener('alpine:init', () => {
                 focusTimeout = setTimeout(() => this.syncIfNeeded(), 1500);
             });
 
-            	// Run bootstrap only on the homepage
-	if (window.location.pathname === '/') {
-		this.bootstrap();
-	}
+            // Run bootstrap only on the homepage
+            if (window.location.pathname === '/') {
+                this.bootstrap();
+            }
         },
 
         updateIsMobile() {
@@ -48,6 +54,7 @@ document.addEventListener('alpine:init', () => {
 
         // --- Bootstrap / delta fetch ---
         async bootstrap(firstBoot = false) {
+            this.setLoading(true);
             const now = Date.now();
             const minInterval = 1000;
             if (this.lastBootstrapTime && now - this.lastBootstrapTime < minInterval) return;
@@ -84,20 +91,23 @@ document.addEventListener('alpine:init', () => {
 
             } catch (err) {
                 console.error(err);
+            } finally {
+                this.setLoading(false);
             }
         },
 
-async syncIfNeeded() {
-	// Skip sync if not on homepage
-	if (window.location.pathname !== '/') return;
+        async syncIfNeeded() {
+            // Skip sync if not on homepage
+            if (window.location.pathname !== '/') return;
 
-	const now = Date.now();
-	const minInterval = 1000;
-	if (this.lastSyncTime && now - this.lastSyncTime < minInterval) return;
-	this.lastSyncTime = now;
+            const now = Date.now();
+            const minInterval = 1000;
+            if (this.lastSyncTime && now - this.lastSyncTime < minInterval) return;
+            this.lastSyncTime = now;
+            this.setLoading(true);
 
-	await this.bootstrap();
-},
+            await this.bootstrap();
+        },
 
         closeTransactionModal() {
             this.showTransactionModal = false;

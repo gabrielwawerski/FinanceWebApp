@@ -8,42 +8,35 @@
 
 		</div>
 
-		<!-- Skeletons -->
-		<div class="transactions-grid tx-skeleton" x-transition.opacity>
-			<template x-if="isLoading && ($store.transactions.transactions?.length ?? 0) > 0">
-				<template x-for="i in pageSize" :key="`skeleton-${i}`">
-					<div class="card tx-card"
-     :class="$store.settings.isCompactMode ? 'mb-1' : 'mb-2'"
-     :style="$store.settings.isCompactMode
-        ? 'display:flex; align-items:center; justify-content:space-between; gap:0.75rem; transition: all 0.3s ease; min-height: 40px; overflow:hidden; font-size:0.8rem;'
-        : 'transition: all 0.3s ease; max-height:200px; font-size:inherit;'"
-     :data-category-color="t.category?.color || '#ccc'">
 
-						<div class="card-content p-4">
-							<div class="level media">
-								<div class="level-left tx-card__left" style="flex: 1;">
-									<div class="is-skeleton"
-									     style="width: 30%; height: 0.8rem; margin-bottom: 0.5rem;"></div>
-									<div class="is-skeleton" style="width: 75%; height: 1rem;"></div>
-								</div>
-								<div class="level-right tx-card__right" style="min-width: 9rem;">
-									<div class="is-skeleton" style="width: 5.5rem; height: 1.2rem;"></div>
-								</div>
-							</div>
+		<div class="transactions-grid" x-transition>
+			<!-- No transactions message -->
+			<template x-if="paginatedTransactions.length === 0 && !$store.app.isLoading">
+				<div class="card tx-card"
+				     :style="{ height: $store.settings.isCompactMode
+				     ? 'calc(var(--tx-card-height-compact) + 8px)'
+				     : 'calc(var(--tx-card-height-default) + 4px)' }"
+				     :class="$store.settings.isCompactMode ? 'mb-1' : 'mb-2'">
+					<div class="card-content p-4"
+					     style="display: flex; align-items: center; justify-content: center; height: 100%;">
+						No transactions.
+					</div>
+				</div>
+			</template>
+
+			<!-- Skeletons -->
+			<template x-if="$store.app.isLoading">
+				<template x-for="i in pageSize" :key="`skeleton-${i}`">
+					<div class="tx-card skeleton-block"
+					     :style="{ height: $store.settings.isCompactMode
+					     ? 'calc(var(--tx-card-height-compact) + 8px)'
+					     : 'calc(var(--tx-card-height-default) + 4px)' }"
+					     :class="$store.settings.isCompactMode ? 'mb-1' : 'mb-2'">
+						<div class="card-content p-4"
+						     style="display: flex; align-items: center; justify-content: center; height: 100%;">
 						</div>
 					</div>
 				</template>
-			</template>
-		</div>
-
-		<!-- Real content -->
-		<div class="transactions-grid" x-show="!isLoading" x-transition>
-			<!-- No transactions message -->
-			<template x-if="paginatedTransactions.length === 0">
-				<div class="notification tx-card"
-				     style="font-size:1.06rem;display:flex; align-items:center; justify-content:center;">
-					No transactions found.
-				</div>
 			</template>
 
 			<!-- Transaction cards -->
@@ -51,8 +44,8 @@
 				<div class="card tx-card"
 				     :class="$store.settings.isCompactMode ? 'mb-1' : 'mb-2'"
 				     :style="$store.settings.isCompactMode
-            ? 'display:flex; align-items:center; justify-content:space-between; gap:0.75rem; transition: all 0.3s ease; min-height: 40px; overflow:hidden; font-size:0.8rem;'
-            : 'transition: all 0.3s ease; max-height:200px; font-size:inherit;'"
+				     ? 'display:flex; align-items:center; justify-content:space-between; gap:0.75rem; transition: all 0.3s ease; min-height: 40px; overflow:hidden; font-size:0.8rem;'
+				     : 'transition: all 0.3s ease; max-height:200px; font-size:inherit;'"
 				>
 
 					<template x-if="!$store.settings.isCompactMode">
@@ -67,13 +60,13 @@
 								<div class="media-right"
 								     style="display:flex; flex-direction:column; align-items:flex-end;">
                         <span class="tag is-clickable is-unselectable"
-          :style="`
+                              :style="`
             --category-color: ${t.category?.color || '#ccc'};
             color: ${$store.app.isDarkTheme ? '#fff' : '#000'};
             border: 1px solid ${t.category?.color || '#888'};
           `"
-          x-text="t.category?.name || 'Uncategorized'"
-          @click="
+                              x-text="t.category?.name || 'Uncategorized'"
+                              @click="
             filters.category === String(t.category?.id)
               ? clearFilters()
               : filters.category = String(t.category?.id)
@@ -97,13 +90,13 @@
 							<div class="tx-card__title" x-text="t.description || 'No description'"
 							     style="flex:1 1 auto; min-width:0; overflow:hidden; text-overflow:ellipsis;"></div>
 							<span class="tag is-clickable is-unselectable"
-          :style="`
+							      :style="`
             --category-color: ${t.category?.color || '#ccc'};
             color: ${$store.app.isDarkTheme ? '#fff' : '#000'};
             border: 1px solid ${t.category?.color || '#888'};
           `"
-          x-text="t.category?.name || 'Uncategorized'"
-          @click="
+							      x-text="t.category?.name || 'Uncategorized'"
+							      @click="
             filters.category === String(t.category?.id)
               ? clearFilters()
               : filters.category = String(t.category?.id)
