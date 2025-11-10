@@ -9,28 +9,30 @@
 		</div>
 
 		<!-- Skeletons -->
-			<template x-if="$store.app.isLoading">
-				<div class="transactions-grid" x-transition>
+		<template x-if="$store.app.isLoading">
+			<div class="transactions-grid" x-transition>
 				<template x-for="i in pageSize" :key="`skeleton-${i}`">
-					<div class="card tx-card skeleton-block" style="gap:0.75rem; transition: all 0.3s ease; min-height: 40px; overflow:hidden; font-size:0.8rem;"
-				     :style="{ height: $store.settings.isCompactMode
+					<div class="card tx-card skeleton-block"
+					     style="gap:0.75rem; transition: all 0.3s ease; min-height: 40px; overflow:hidden; font-size:0.8rem;"
+					     :style="{ height: $store.settings.isCompactMode
 				     ? 'calc(var(--tx-card-height-compact) + 8px) !important'
 				     : 'calc(var(--tx-card-height-default) + 4px) !important' }"
-				     :class="$store.settings.isCompactMode ? 'mb-1' : 'mb-2'" x-transition>
-					<div class="card-content p-4"
-					     style="display: flex; align-items: center; justify-content: center; height: 100%;">
+					     :class="$store.settings.isCompactMode ? 'mb-1' : 'mb-2'" x-transition>
+						<div class="card-content p-4"
+						     style="display: flex; align-items: center; justify-content: center; height: 100%;">
+						</div>
 					</div>
-				</div>
 				</template>
-				</div>
-			</template>
+			</div>
+		</template>
 
 
 		<!-- Real content -->
 		<div class="transactions-grid" x-show="!$store.app.isLoading">
 			<!-- No transactions message -->
 			<template x-if="paginatedTransactions.length === 0">
-				<div class="card tx-card" style="gap:0.75rem; transition: all 0.3s ease; min-height: 40px; overflow:hidden; font-size:1.1rem;display:flex; align-items:center; justify-content:center;"
+				<div class="card tx-card"
+				     style="gap:0.75rem; transition: all 0.3s ease; min-height: 40px; overflow:hidden; font-size:1.1rem;display:flex; align-items:center; justify-content:center;"
 				     :style="{ height: $store.settings.isCompactMode
 				     ? 'calc(var(--tx-card-height-compact) + 8px) !important'
 				     : 'calc(var(--tx-card-height-default) + 4px) !important' }"
@@ -44,13 +46,13 @@
 				<div class="card tx-card" x-transition
 				     :class="$store.settings.isCompactMode ? 'mb-1' : 'mb-2'"
 				     :style="$store.settings.isCompactMode
-            ? 'display:flex; align-items:center; justify-content:space-between; gap:0.75rem; transition: all 0.3s ease; min-height: 40px; overflow:hidden; font-size:0.8rem;'
+            ? 'display:flex; align-items:center; justify-content:space-between; gap:0.75rem; min-height: 40px; overflow:hidden; font-size:0.8rem;'
             : ''"
 				>
 
 					<template x-if="!$store.settings.isCompactMode">
 						<!-- Default view -->
-						<div class="card-content p-4">
+						<div class="card-content" x-transition.duration.300ms>
 							<div class="media">
 								<div class="media-content">
 									<div class="tx-card__meta has-text-grey" x-text="formatDate(t.date)"></div>
@@ -60,18 +62,18 @@
 								<div class="media-right"
 								     style="display:flex; flex-direction:column; align-items:flex-end;">
                         <span class="tag is-clickable is-unselectable"
-          :style="`
-            --category-color: ${t.category?.color || '#ccc'};
-            color: ${$store.app.isDarkTheme ? '#fff' : '#000'};
-            border: 1px solid ${t.category?.color || '#888'};
-          `"
-          x-text="t.category?.name || 'Uncategorized'"
-          @click="
-            filters.category === String(t.category?.id)
-              ? clearFilters()
-              : filters.category = String(t.category?.id)
-          ">
-    </span>
+                                                  :style="`
+                                --category-color: ${t.category?.color || '#ccc'};
+                                color: ${$store.app.isDarkTheme ? '#fff' : '#000'};
+                                border: 1px solid ${t.category?.color || '#888'};
+                              `"
+                                                  x-text="t.category?.name || 'Uncategorized'"
+                                                  @click="
+                                filters.category === String(t.category?.id)
+                                  ? clearFilters()
+                                  : filters.category = String(t.category?.id)
+                              ">
+                        </span>
 									<p class="has-text-weight-semibold"
 									   :class="t.is_income ? 'has-text-success' : 'has-text-danger'"
 									   x-text="formatAmount(t.amount, t.currency || 'PLN')"></p>
@@ -80,9 +82,10 @@
 						</div>
 					</template>
 
-					<template x-if="$store.settings.isCompactMode">
+					<template x-if="$store.settings.isCompactMode" x-transition.duration.300ms>
 						<!-- Compact inline view -->
-						<div class="card-content" style="display:flex; align-items:center; gap:0.75rem; width:100%;">
+						<div class="card-content" x-transition
+						     style="display:flex; align-items:center; gap:0.75rem; width:100%;">
 							<div class="tx-card__meta has-text-grey"
 							     x-text="formatCompactDate(t.date)"
 							></div>
@@ -90,18 +93,18 @@
 							<div class="tx-card__title" x-text="t.description || 'No description'"
 							     style="flex:1 1 auto; min-width:0; overflow:hidden; text-overflow:ellipsis;"></div>
 							<span class="tag is-clickable is-unselectable"
-          :style="`
-            --category-color: ${t.category?.color || '#ccc'};
-            color: ${$store.app.isDarkTheme ? '#fff' : '#000'};
-            border: 1px solid ${t.category?.color || '#888'};
-          `"
-          x-text="t.category?.name || 'Uncategorized'"
-          @click="
-            filters.category === String(t.category?.id)
-              ? clearFilters()
-              : filters.category = String(t.category?.id)
-          ">
-    </span>
+							      :style="`
+                                    --category-color: ${t.category?.color || '#ccc'};
+                                    color: ${$store.app.isDarkTheme ? '#fff' : '#000'};
+                                    border: 1px solid ${t.category?.color || '#888'};
+                                  `"
+													      x-text="t.category?.name || 'Uncategorized'"
+													      @click="
+                                    filters.category === String(t.category?.id)
+                                      ? clearFilters()
+                                      : filters.category = String(t.category?.id)
+                                  ">
+                            </span>
 							<p class="has-text-weight-semibold"
 							   :class="t.is_income ? 'has-text-success' : 'has-text-danger'"
 							   x-text="formatAmount(t.amount, t.currency || 'PLN')"

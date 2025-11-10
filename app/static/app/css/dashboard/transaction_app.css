@@ -37,7 +37,7 @@
 	display: grid;
 	grid-template-columns: 1fr;
 	gap: 0 !important;
-	margin-bottom: 0.2rem;
+	margin-bottom: 0.4rem;
 }
 
 /*********** CARD ***********/

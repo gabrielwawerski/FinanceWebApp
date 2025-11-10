@@ -34,7 +34,8 @@
 				</div>
 				<div :style="`color: ${$store.app.balance < 0 ? '#e74c3c' : '#2ecc71'}`">
 			<span class="balance-value is-size-4"
-			      x-text="$store.app.balance.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2}) + '&nbsp;PLN'"></span>
+			      x-text="$store.app.balance.toLocaleString({minimumFractionDigits: 2, maximumFractionDigits: 2}) + '&nbsp;PLN'">
+			</span>
 				</div>
 			</div>
 		</div>
