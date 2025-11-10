@@ -22,6 +22,10 @@
 	--expense-color: #e74c3c;
 }
 
+.section {
+	padding: 3rem 0.75rem !important;
+}
+
 .income { color: #2ecc71 !important; }
 .expense { color: #e74c3c !important; }
 

@@ -7,14 +7,14 @@
             'is-dark': !$store.app.isDarkTheme
         }"
 		        @click="clearFilters"
-		        :disabled="!filters.type && !filters.category && !filters.description">
+		        :disabled="(!filters.type && !filters.category && !filters.description) || $store.transactions.isTransactionsEmpty()">
 			Clear
 		</button>
 
 		<div class="field">
 			<div class="control">
 				<div class="select">
-					<select x-model.number="pageSize">
+					<select x-model.number="pageSize" :disabled="$store.transactions.isTransactionsEmpty()">
 						<option value="5">5 / page</option>
 						<option value="10">10 / page</option>
 						<option value="20">20 / page</option>
@@ -26,7 +26,7 @@
 		<div class="field">
 			<div class="control">
 				<div class="select">
-					<select x-model="filters.type">
+					<select x-model="filters.type" :disabled="$store.transactions.isTransactionsEmpty()">
 						<option value="">All types</option>
 						<option value="income">Income</option>
 						<option value="expense">Expense</option>
@@ -38,7 +38,7 @@
 		<div class="field">
 			<div class="control">
 				<div class="select">
-					<select x-model="filters.category">
+					<select x-model="filters.category" :disabled="$store.transactions.isTransactionsEmpty()">
 						<option value="">All categories</option>
 						<template x-for="c in filteredCategories" :key="c.id">
 							<option :value="String(c.id)" x-text="c.name"></option>
@@ -56,7 +56,7 @@
 			<!--				</span>-->
 			<!--			</p>-->
 			<p class="control is-expanded">
-				<input
+				<input  :disabled="$store.transactions.isTransactionsEmpty()"
 						class="input"
 						type="search"
 						placeholder="Search description"

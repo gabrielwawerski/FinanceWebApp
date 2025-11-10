@@ -1,5 +1,4 @@
 {% extends "app/base.html" %}
-
 {% load static %}
 
 {% block extra_head %}
@@ -10,40 +9,40 @@
 
 {% block content %}
 {% include "app/modals/add_transaction.html" %}
+
 <section class="section" x-cloak
-         style="margin-bottom: 0 !important; padding-bottom: 1rem !important; padding-top: 0 !important;">
-	<div x-data="transactionApp()" class="container is-max-desktop">
+         style="margin-bottom:0 !important; padding-bottom:1rem !important; padding-top:0 !important;">
+	<div x-data class="container is-max-desktop">
 
-		<div class="transactions-header">
-			<!-- Left: Add Transaction -->
-			<div style="display: flex; align-items: center;">
-				<button class="button is-primary is-normal" @click="$store.app.openTransactionModal()">Add Transaction
+		<!-- Transactions header: Add button / Compact toggle / Balance -->
+		<div class="transactions-header" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem;">
+
+			<!-- Left: Add Transaction + Compact Toggle -->
+			<div style="display:flex; align-items:center; gap:0.75rem;">
+				<button class="button is-primary" @click="$store.app.openTransactionModal()">
+					Add Transaction
 				</button>
+			</div>
 
-				<template x-if="!$store.app.isMobile">
-					<button class="button is-small ml-3"
-					        @click="$store.settings.isCompactMode = !$store.settings.isCompactMode"
-					        x-text="$store.settings.isCompactMode ? 'Normal View' : 'Compact View'">
-					</button>
-				</template>
-			</div>
 			<!-- Right: Balance -->
-			<div class="balance-container" x-cloak>
-				<div class="balance-title has-text-weight-bold">
-					Balance
-				</div>
+			<div class="balance-container" x-cloak style="text-align:right;">
+				<div class="balance-title has-text-weight-bold">Balance</div>
 				<div :style="`color: ${$store.app.balance < 0 ? '#e74c3c' : '#2ecc71'}`">
-			<span class="balance-value is-size-4"
-			      x-text="$store.app.balance.toLocaleString({minimumFractionDigits: 2, maximumFractionDigits: 2}) + '&nbsp;PLN'">
-			</span>
+					<span class="balance-value is-size-4"
+					      x-html="$store.app.balance.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2}) + '&nbsp;PLN'">
+					</span>
 				</div>
 			</div>
+
 		</div>
+
+		<!-- Transaction table -->
 		{% include "app/components/dashboard/transaction_table.html" %}
+
 	</div>
 </section>
-
 {% endblock %}
 
 {% block extra_js %}
+<!-- Add page-specific JS here if needed -->
 {% endblock %}

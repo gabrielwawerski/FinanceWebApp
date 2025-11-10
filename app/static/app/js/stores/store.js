@@ -31,7 +31,7 @@ document.addEventListener('alpine:init', () => {
             };
 
             // Add throttled resize listener
-            window.addEventListener('resize', throttle(() => this.updateIsMobile(), 200));
+            window.addEventListener('resize', throttle(() => this.updateIsMobile(), 500));
 
             let focusTimeout;
             window.addEventListener('focus', () => {
@@ -54,7 +54,7 @@ document.addEventListener('alpine:init', () => {
         },
 
         // --- Bootstrap / delta fetch ---
-        async bootstrap(firstBoot = false) {
+        async bootstrap(autoRefresh = false) {
             const now = Date.now();
             const minInterval = 1000;
             if (this.lastBootstrapTime && now - this.lastBootstrapTime < minInterval) return;
@@ -66,12 +66,12 @@ document.addEventListener('alpine:init', () => {
                 if (this.lastCategoryUpdate) params.append('last_category_update', this.lastCategoryUpdate);
 
                 if (this.firstRun) {
-                    this.setLoading(true);
+                    this.setLoading(autoRefresh);
                     this.firstRun = false;
                 }
                 const res = await fetch(`/api/bootstrap/?${params.toString()}`);
                 if (!res.ok) {
-                    this.setLoading(false);
+                    this.setLoading(autoRefresh);
                     throw new Error('Bootstrap failed');
                 }
                 const data = await res.json();
@@ -112,7 +112,7 @@ document.addEventListener('alpine:init', () => {
             if (this.lastSyncTime && now - this.lastSyncTime < minInterval) return;
             this.lastSyncTime = now;
 
-            await this.bootstrap();
+            await this.bootstrap(true);
         },
 
         closeTransactionModal() {

@@ -1,173 +1,117 @@
-function transactionApp() {
-    return {
-        // --- UI state ---
-        currentPage: 1,
-        pageSize: safePersist(5, 'pageSize'),
+/* Use tabs for indentation as preferred. */
+function transactionsList(){
+	return {
+		// reactive state
+		q: '',
+		categoryFilter: '',
+		rowsPerPage: parseInt(getComputedStyle(document.documentElement).getPropertyValue('--tx-rows-per-page')) || 8,
+		currentPage: 1,
 
-        // --- Filters (unified) ---
-        filters: {
-            description: '',
-            type: '',       // '', 'income', 'expense'
-            category: ''    // '', or category id as string
-        },
+		// init to read categories from store and react to store changes if needed
+		init() {
+			// ensure rowsPerPage numeric and valid
+			this.rowsPerPage = Number(this.rowsPerPage) || 8;
 
-        // --- Derived data ---
-        get allTransactions() {
-            return this.$store.transactions?.transactions || [];
-        },
+			// recompute container if compact toggled or page size changed
+			this.$watch('rowsPerPage', () => {
+				this.currentPage = 1;
+			});
+			// watch compact mode change to keep the page consistent
+			this.$watch('$store.settings.isCompactMode', () => {
+				// keep current page, container will animate height
+			});
+		},
 
-        get categories() {
-            return this.$store.transactions?.categories || [];
-        },
+		// computed helpers pulling from your stores
+		get transactions() {
+			return Alpine.store('transactions').transactions || [];
+		},
+		get categories() {
+			return Alpine.store('transactions').categories || [];
+		},
 
-        get filteredTransactions() {
-            let list = [...this.allTransactions];
+		// Count after filters applied
+		get filtered() {
+			const q = (this.q || '').trim().toLowerCase();
+			const cat = this.categoryFilter;
+			return this.transactions.filter(tx => {
+				if (cat && String(tx.category_id) !== String(cat)) return false;
+				if (!q) return true;
+				// search description and amount
+				if ((tx.description || '').toLowerCase().includes(q)) return true;
+				if (String(tx.amount).toLowerCase().includes(q)) return true;
+				return false;
+			});
+		},
+		get filteredCount() {
+			return this.filtered.length;
+		},
 
-            // --- Filter by description / note ---
-            const q = (this.filters.description || '').trim().toLowerCase();
-            if (q) {
-                list = list.filter(t =>
-                    (String(t.description || '')).toLowerCase().includes(q)
-                );
-            }
+		// pagination:
+		get totalPages() {
+			return Math.max(1, Math.ceil(this.filteredCount / this.rowsPerPage));
+		},
+		get paginated() {
+			const start = (this.currentPage - 1) * this.rowsPerPage;
+			return this.filtered.slice(start, start + this.rowsPerPage);
+		},
 
-            // --- Filter by type ---
-            if (this.filters.type) {
-                list = list.filter(t => this.resolveType(t) === this.filters.type);
-            }
+		// heights for container calculation (stay in sync with CSS variables)
+		get rowHeight() {
+			return this.$store.settings.isCompactMode
+				? Number(getComputedStyle(document.documentElement).getPropertyValue('--tx-row-h-compact')) || 44
+				: Number(getComputedStyle(document.documentElement).getPropertyValue('--tx-row-h-default')) || 70;
+		},
+		get headerHeight() {
+			return Number(getComputedStyle(document.documentElement).getPropertyValue('--tx-header-h')) || 56;
+		},
+		get computedContainerHeight() {
+			// container = header area is outside; this element receives: rowsPerPage * rowHeight
+			// but we keep some small buffer for borders — use integer px
+			return Math.round(this.rowsPerPage * this.rowHeight + 0); // header is outside this element
+		},
+		get computedListInnerHeight() {
+			// same as container height, but useful if we want to subtract something later
+			return Math.round(this.rowsPerPage * this.rowHeight);
+		},
 
-            // --- Filter by category ---
-            if (this.filters.category) {
-                list = list.filter(t => String(t.category_id) === String(this.filters.category));
-            }
+		// UI actions
+		goToPage(n) {
+			const p = Math.max(1, Math.min(this.totalPages, n));
+			this.currentPage = p;
+		},
+		nextPage() {
+			this.goToPage(this.currentPage + 1);
+		},
+		prevPage() {
+			this.goToPage(this.currentPage - 1);
+		},
+		edit(tx){
+			// delegate to your modal / store
+			Alpine.store('app').openTransactionModal();
+			// You might also want to set a selectedTransaction in a store
+			console.log('edit requested', tx && tx.id);
+		},
 
-            return list;
-        },
-
-        get displayedCount() {
-            return Math.max(1, this.paginatedTransactions.length); // count "No transactions found." as 1
-        },
-
-        get filteredCategories() {
-            if (!this.filters.type) return this.categories; // show all if no type selected
-            return this.categories.filter(c => c.type === this.filters.type);
-        },
-
-        get totalPages() {
-            return Math.max(1, Math.ceil(this.filteredTransactions.length / this.pageSize));
-        },
-
-        get paginatedTransactions() {
-            const page = Math.min(this.currentPage, this.totalPages);
-            const start = (page - 1) * this.pageSize;
-            return this.filteredTransactions.slice(start, start + this.pageSize);
-        },
-
-        get fillerCount() {
-        	if (this.$store.app.isLoading) return 0; // hide during skeletons
-        	if (this.paginatedTransactions.length === 0) return this.pageSize - 1; // hide when no transactions
-        	return Math.max(0, this.pageSize - this.paginatedTransactions.length);
-        },
-
-        // --- Actions / pagination ---
-        setPageSize(size) {
-            this.pageSize = Number(size) || 5; // automatically persisted
-        },
-        goToPage(page) {
-            const p = Math.min(Math.max(1, page), this.totalPages);
-            if (p !== this.currentPage) this.currentPage = p;
-        },
-        nextPage() {
-            this.goToPage(this.currentPage + 1);
-        },
-        prevPage() {
-            this.goToPage(this.currentPage - 1);
-        },
-        clearFilters() {
-            this.filters.description = '';
-            this.filters.type = '';
-            this.filters.category = '';
-            this.currentPage = 1;
-        },
-
-        // --- Helpers ---
-        formatDate(d) {
-            if (!d) return '';
-            try {
-                const date = (typeof d === 'string') ? new Date(d) : d;
-                return date.toLocaleDateString(undefined, {year: 'numeric', month: 'short', day: '2-digit'});
-            } catch {
-                return String(d);
-            }
-        },
-
-        formatCompactDate(dateString) {
-            const d = new Date(dateString);
-            const day = String(d.getDate()).padStart(2, '0');
-            const month = String(d.getMonth() + 1).padStart(2, '0');
-            const year = String(d.getFullYear()).slice(-2); // last 2 digits
-            return `${day}/${month}/${year}`; // e.g., 09/11/25
-        },
-
-        formatAmount(n, currency = 'USD') {
-            const val = Number(n) || 0;
-
-            // Use Intl.NumberFormat just for the number (no currency)
-            const formattedNumber = new Intl.NumberFormat(undefined, {
-                minimumFractionDigits: 2,
-                maximumFractionDigits: 2
-            }).format(val);
-
-            // Append currency after number
-            return `${formattedNumber} ${currency}`;
-        },
-
-        resolveType(t) {
-            if (!t) return '';
-            if (typeof t.is_income === 'boolean') return t.is_income ? 'income' : 'expense';
-            if (typeof t.amount === 'number') return t.amount >= 0 ? 'income' : 'expense';
-            return '';
-        },
-
-        amountClass(t) {
-            return this.resolveType(t) === 'expense' ? 'tx-amount--expense' : 'tx-amount--income';
-        },
-
-        // --- Init & watchers ---
-        async init() {
-            this.pageSize = Number(this.pageSize);
-
-            // --- Watch filters for page reset & type/category sync ---
-            const resetPage = () => this.currentPage = 1;
-
-            this.$watch('filters.description', resetPage);
-            this.$watch('filters.type', resetPage);
-            this.$watch('filters.category', resetPage);
-            this.$watch('pageSize', resetPage);
-
-            // --- Sync category/type dependencies ---
-            this.$watch('filters.type', (newType) => {
-                // Remove category if it does not match new type
-                if (this.filters.category) {
-                    const selected = this.categories.find(c => String(c.id) === String(this.filters.category));
-                    if (selected && selected.type !== newType) this.filters.category = '';
-                }
-            });
-
-            this.$watch('filters.category', (newCat) => {
-                if (!newCat) return;
-                const cat = this.categories.find(c => String(c.id) === String(newCat));
-                if (!cat) return;
-                // Auto-set type to match category
-                if (cat.type && cat.type !== this.filters.type) {
-                    this.filters.type = cat.type;
-                }
-            });
-
-            // --- Keep current page in range ---
-            this.$watch(() => this.filteredTransactions.length, () => {
-                if (this.currentPage > this.totalPages) this.currentPage = this.totalPages;
-            });
-        }
-    };
+		// small helpers for display
+		formatDate(d) {
+			if (!d) return '';
+			try {
+				const dt = new Date(d);
+				return dt.toLocaleDateString();
+			} catch (e) {
+				return d;
+			}
+		},
+		formatAmount(a, isIncome){
+			const n = Number(a) || 0;
+			const sign = isIncome ? '+' : '-';
+			// keep simple; you can replace with Intl.NumberFormat if you want locales
+			return `${sign} ${n.toFixed(2)}`;
+		},
+		lookupCategory(id){
+			const found = this.categories.find(c => String(c.id) === String(id));
+			return found ? found.name : '';
+		}
+	};
 }

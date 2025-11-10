@@ -3,6 +3,14 @@ document.addEventListener('alpine:init', () => {
 		transactions: safePersist([], 'transactions'),
 		categories: safePersist([], 'categories'),
 
+		get transactionsCount() {
+		  return Array.isArray(this.transactions) ? this.transactions.length : 0;
+		},
+
+		isTransactionsEmpty() {
+		  return this.transactionsCount === 0;
+		},
+
 		getApiHeaders() {
 			return {
 				'Content-Type': 'application/json',

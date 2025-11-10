@@ -1,131 +1,154 @@
-<section class="transactions-section">
-	<div class="container">
-		<!-- Filters + Pagination (always visible) -->
-		<div class="transactions-toolbar">
-			<template x-if="$store.app.isMobile">
-				{% include "app/components/dashboard/transaction_filters.html" %}
-			</template>
+<section
+	x-data="transactionsList()"
+	class=""
+	:class="{ 'is-dark': $store.app.isDarkTheme }"
+	>
 
+	<!-- Header: filters + controls -->
+	<header class="tx-card__header">
+		<div style="display:flex;align-items:center;gap:12px;flex:1;">
+			<!-- search -->
+			<div class="field">
+				<div class="control">
+					<input
+						class="input"
+						placeholder="Search description or amount"
+						type="text"
+						x-model="q"
+						@input="goToPage(1)"
+						>
+				</div>
+			</div>
+
+			<!-- category filter (simple select populated from store.categories) -->
+			<div class="field">
+				<div class="control">
+					<div class="select">
+						<select x-model="categoryFilter" @change="goToPage(1)">
+							<option value="">All categories</option>
+							<template x-for="c in categories" :key="c.id">
+								<option :value="c.id" x-text="c.name"></option>
+							</template>
+						</select>
+					</div>
+				</div>
+			</div>
 		</div>
 
-		<!-- Skeletons -->
-		<template x-if="$store.app.isLoading">
-			<div class="transactions-grid" x-transition>
-				<template x-for="i in pageSize" :key="`skeleton-${i}`">
-					<div class="card tx-card skeleton-block"
-					     style="gap:0.75rem; transition: all 0.3s ease; min-height: 40px; overflow:hidden; font-size:0.8rem;"
-					     :style="{ height: $store.settings.isCompactMode
-				     ? 'calc(var(--tx-card-height-compact) + 8px) !important'
-				     : 'calc(var(--tx-card-height-default) + 4px) !important' }"
-					     :class="$store.settings.isCompactMode ? 'mb-1' : 'mb-2'" x-transition>
-						<div class="card-content p-4"
-						     style="display: flex; align-items: center; justify-content: center; height: 100%;">
-						</div>
-					</div>
-				</template>
+		<!-- controls: compact toggle, per-page, pagination -->
+		<div style="display:flex;align-items:center;gap:8px;">
+			<!-- Show compact toggle only on desktop -->
+<!--				<template x-if="!$store.app.isMobile">-->
+					<button class="button is-small"
+					        @click="$store.settings.isCompactMode = !$store.settings.isCompactMode"
+					        x-text="$store.settings.isCompactMode ? 'Normal' : 'Compact'">
+					</button>
+<!--				</template>-->
+
+			<div class="control">
+				<div class="select">
+					<select x-model.number="rowsPerPage" @change="goToPage(1)">
+						<option :value="6">6</option>
+						<option :value="8">8</option>
+						<option :value="12">12</option>
+						<option :value="20">20</option>
+					</select>
+				</div>
 			</div>
-		</template>
 
+			<nav class="pagination" role="navigation" aria-label="pagination" style="margin-left:8px;">
+				<a class="pagination-previous" :class="{ 'is-disabled': currentPage <= 1 }" @click.prevent="prevPage()">Prev</a>
+				<a class="pagination-next" :class="{ 'is-disabled': currentPage >= totalPages }" @click.prevent="nextPage()">Next</a>
+				<ul class="pagination-list" style="margin-left:8px;">
+					<li><a class="pagination-link is-current" x-text="currentPage"></a></li>
+					<li style="margin-left:6px;color:var(--tx-muted)">/ <span x-text="totalPages"></span></li>
+				</ul>
+			</nav>
+		</div>
+	</header>
 
-		<!-- Real content -->
-		<div class="transactions-grid" x-show="!$store.app.isLoading">
-			<!-- No transactions message -->
-			<template x-if="paginatedTransactions.length === 0">
-				<div class="card tx-card"
-				     style="gap:0.75rem; transition: all 0.3s ease; min-height: 40px; overflow:hidden; font-size:1.1rem;display:flex; align-items:center; justify-content:center;"
-				     :style="{ height: $store.settings.isCompactMode
-				     ? 'calc(var(--tx-card-height-compact) + 8px) !important'
-				     : 'calc(var(--tx-card-height-default) + 4px) !important' }"
-				     :class="$store.settings.isCompactMode ? 'mb-1' : 'mb-2'" x-transition>
-					No transactions found.
+	<!-- Body: fixed-height container; computed height set inline -->
+	<div
+		class="tx-card__body"
+		:style="`height: ${computedContainerHeight}px;`"
+	>
+		<!-- scrollable list -->
+		<div
+			class="tx-list"
+			:style="`height: ${computedListInnerHeight}px;`"
+			>
+
+			<!-- LOADING skeletons -->
+			<template x-if="$store.app.isLoading">
+				<div>
+					<template x-for="n in rowsPerPage" :key="n">
+						<div class="skeleton-row" :class="{ 'skeleton--compact': $store.settings.isCompactMode }">
+							<div style="width:100px;flex:0 0 100px;" class="skeleton skeleton__rect"></div>
+							<div style="flex:1 1 auto;">
+								<div class="skeleton skeleton__rect" style="width:50%;height:14px;margin-bottom:8px;"></div>
+								<div class="skeleton skeleton__rect" style="width:30%;height:12px;"></div>
+							</div>
+							<div style="width:120px;flex:0 0 120px;" class="skeleton skeleton__rect"></div>
+							<div style="width:64px;flex:0 0 64px;" class="skeleton skeleton__rect"></div>
+						</div>
+					</template>
 				</div>
 			</template>
 
-			<!-- Transaction cards -->
-			<template x-for="t in paginatedTransactions" :key="t.id">
-				<div class="card tx-card" x-transition
-				     :class="$store.settings.isCompactMode ? 'mb-1' : 'mb-2'"
-				     :style="$store.settings.isCompactMode
-            ? 'display:flex; align-items:center; justify-content:space-between; gap:0.75rem; min-height: 40px; overflow:hidden; font-size:0.8rem;'
-            : ''"
-				>
-
-					<template x-if="!$store.settings.isCompactMode">
-						<!-- Default view -->
-						<div class="card-content" x-transition.duration.300ms>
-							<div class="media">
-								<div class="media-content">
-									<div class="tx-card__meta has-text-grey" x-text="formatDate(t.date)"></div>
-									<div class="tx-card__title" x-text="t.description || 'No description'"
-									     style="white-space: pre-line;"></div>
-								</div>
-								<div class="media-right"
-								     style="display:flex; flex-direction:column; align-items:flex-end;">
-                        <span class="tag is-clickable is-unselectable"
-                                                  :style="`
-                                --category-color: ${t.category?.color || '#ccc'};
-                                color: ${$store.app.isDarkTheme ? '#fff' : '#000'};
-                                border: 1px solid ${t.category?.color || '#888'};
-                              `"
-                                                  x-text="t.category?.name || 'Uncategorized'"
-                                                  @click="
-                                filters.category === String(t.category?.id)
-                                  ? clearFilters()
-                                  : filters.category = String(t.category?.id)
-                              ">
-                        </span>
-									<p class="has-text-weight-semibold"
-									   :class="t.is_income ? 'has-text-success' : 'has-text-danger'"
-									   x-text="formatAmount(t.amount, t.currency || 'PLN')"></p>
+			<!-- NOT loading: actual rows -->
+			<template x-if="!$store.app.isLoading">
+				<div>
+					<!-- If no results: show placeholder (occupies same height) -->
+					<template x-if="filteredCount === 0">
+						<div class="tx-no-results">
+							<div class="card" style="width:320px;">
+								<div class="card-content">
+									<p class="title is-6" style="margin-bottom:6px">No transactions</p>
+									<p class="subtitle is-7" style="color:var(--tx-muted)">No transactions match the current filters.</p>
 								</div>
 							</div>
 						</div>
 					</template>
 
-					<template x-if="$store.settings.isCompactMode" x-transition.duration.300ms>
-						<!-- Compact inline view -->
-						<div class="card-content" x-transition
-						     style="display:flex; align-items:center; gap:0.75rem; width:100%;">
-							<div class="tx-card__meta has-text-grey"
-							     x-text="formatCompactDate(t.date)"
-							></div>
-
-							<div class="tx-card__title" x-text="t.description || 'No description'"
-							     style="flex:1 1 auto; min-width:0; overflow:hidden; text-overflow:ellipsis;"></div>
-							<span class="tag is-clickable is-unselectable"
-							      :style="`
-                                    --category-color: ${t.category?.color || '#ccc'};
-                                    color: ${$store.app.isDarkTheme ? '#fff' : '#000'};
-                                    border: 1px solid ${t.category?.color || '#888'};
-                                  `"
-													      x-text="t.category?.name || 'Uncategorized'"
-													      @click="
-                                    filters.category === String(t.category?.id)
-                                      ? clearFilters()
-                                      : filters.category = String(t.category?.id)
-                                  ">
-                            </span>
-							<p class="has-text-weight-semibold"
-							   :class="t.is_income ? 'has-text-success' : 'has-text-danger'"
-							   x-text="formatAmount(t.amount, t.currency || 'PLN')"
-							   style="display: flex; justify-content:flex-end;flex:0 0 auto;min-width: 120px;"></p>
-						</div>
-					</template>
+	<!-- Items -->
+	<template x-for="(tx, idx) in paginated" :key="tx.id ?? idx">
+		<div>
+			<!-- Desktop (non-mobile) layout shown with x-show -->
+			<div
+				class="tx-row"
+				:class="{ 'tx-row--compact': $store.settings.isCompactMode }"
+				x-show="!$store.app.isMobile"
+				style="display: flex;"
+				>
+				<div class="tx-row__date" x-text="formatDate(tx.date)"></div>
+				<div class="tx-row__desc" x-text="tx.description || '—'"></div>
+				<div class="tx-row__cat" x-text="lookupCategory(tx.category_id)"></div>
+				<div class="tx-row__amount" x-text="formatAmount(tx.amount, tx.is_income)"></div>
+				<div class="tx-row__actions">
+					<button class="button is-small" @click="edit(tx)">Edit</button>
 				</div>
-			</template>
+			</div>
 
-
-			<!-- Invisible fillers (only if there are transactions and fillerCount > 0) -->
-			<template x-for="i in fillerCount" :key="`filler-${i}-${$store.settings.isCompactMode}`">
-				<div class="card tx-card tx-card--filler is-invisible"
-				     :class="{'is-compact': $store.settings.isCompactMode,
-                  'is-default': !$store.settings.isCompactMode}"></div>
-			</template>
+			<!-- Mobile layout shown with x-show (keeps DOM stable) -->
+			<div
+				class="tx-mobile-card"
+				:class="{ 'tx-mobile-card--compact': $store.settings.isCompactMode }"
+				x-show="$store.app.isMobile"
+				style="display: block;"
+			>
+				<div class="tx-mb-header">
+					<span class="tx-mb-date" x-text="formatDate(tx.date)"></span>
+					<span class="tx-mb-amount" x-text="formatAmount(tx.amount, tx.is_income)"></span>
+				</div>
+				<div class="tx-mb-desc" x-text="tx.description || '—'"></div>
+				<div class="tx-mb-footer">
+					<span class="tx-mb-cat" x-text="lookupCategory(tx.category_id)"></span>
+					<button class="button is-small" @click="edit(tx)">Edit</button>
+				</div>
+			</div>
 		</div>
-
-		<div class="transactions-toolbar">
-			<template x-if="!$store.app.isMobile">
-				{% include "app/components/dashboard/transaction_filters.html" %}
+	</template>
+				</div>
 			</template>
 		</div>
 	</div>
