@@ -11,8 +11,6 @@ function transactionApp() {
             category: ''    // '', or category id as string
         },
 
-        skeletonsVisible: false,
-
         // --- Derived data ---
         get allTransactions() {
             return this.$store.transactions?.transactions || [];
@@ -29,8 +27,7 @@ function transactionApp() {
             const q = (this.filters.description || '').trim().toLowerCase();
             if (q) {
                 list = list.filter(t =>
-                    (String(t.description || '')).toLowerCase().includes(q) ||
-                    (String(t.note || t.notes || '')).toLowerCase().includes(q)
+                    (String(t.description || '')).toLowerCase().includes(q)
                 );
             }
 
@@ -67,8 +64,9 @@ function transactionApp() {
         },
 
         get fillerCount() {
-            const count = this.displayedCount;
-            return count < this.pageSize ? this.pageSize - count : 0;
+        	if (this.$store.app.isLoading) return 0; // hide during skeletons
+        	if (this.paginatedTransactions.length === 0) return this.pageSize - 1; // hide when no transactions
+        	return Math.max(0, this.pageSize - this.paginatedTransactions.length);
         },
 
         // --- Actions / pagination ---
@@ -103,13 +101,13 @@ function transactionApp() {
             }
         },
 
-         formatCompactDate(dateString) {
-    const d = new Date(dateString);
-    const day = String(d.getDate()).padStart(2, '0');
-    const month = String(d.getMonth() + 1).padStart(2, '0');
-    const year = String(d.getFullYear()).slice(-2); // last 2 digits
-    return `${day}/${month}/${year}`; // e.g., 09/11/25
-},
+        formatCompactDate(dateString) {
+            const d = new Date(dateString);
+            const day = String(d.getDate()).padStart(2, '0');
+            const month = String(d.getMonth() + 1).padStart(2, '0');
+            const year = String(d.getFullYear()).slice(-2); // last 2 digits
+            return `${day}/${month}/${year}`; // e.g., 09/11/25
+        },
 
         formatAmount(n, currency = 'USD') {
             const val = Number(n) || 0;
@@ -137,9 +135,6 @@ function transactionApp() {
 
         // --- Init & watchers ---
         async init() {
-            const store = this.$store.transactions;
-            const hasFetch = store && typeof store.fetchTransactions === 'function';
-
             this.pageSize = Number(this.pageSize);
 
             // --- Watch filters for page reset & type/category sync ---
@@ -168,25 +163,6 @@ function transactionApp() {
                     this.filters.type = cat.type;
                 }
             });
-
-            // --- Fetch data if needed ---
-            if ((store?.transactions || []).length > 0) {
-                Alpine.store('app').setLoading(false);
-            } else {
-                Alpine.store('app').setLoading(true);
-                try {
-                    if (hasFetch) {
-                        await store.fetchTransactions();
-                        if (typeof store.fetchCategories === 'function') {
-                            await store.fetchCategories();
-                        }
-                    } else {
-                        await new Promise(r => setTimeout(r, 300));
-                    }
-                } finally {
-                    requestAnimationFrame(() => Alpine.store('app').setLoading(false));
-                }
-            }
 
             // --- Keep current page in range ---
             this.$watch(() => this.filteredTransactions.length, () => {

@@ -10,7 +10,8 @@ document.addEventListener('alpine:init', () => {
 
         showTransactionModal: false,
 
-        isLoading: Alpine.reactive(false),
+        isLoading: false,
+        firstRun: true,
 
 		setLoading(isLoading) {
 			this.isLoading = isLoading;
@@ -54,7 +55,6 @@ document.addEventListener('alpine:init', () => {
 
         // --- Bootstrap / delta fetch ---
         async bootstrap(firstBoot = false) {
-            this.setLoading(true);
             const now = Date.now();
             const minInterval = 1000;
             if (this.lastBootstrapTime && now - this.lastBootstrapTime < minInterval) return;
@@ -65,8 +65,15 @@ document.addEventListener('alpine:init', () => {
                 if (this.lastTransactionUpdate) params.append('last_transaction_update', this.lastTransactionUpdate);
                 if (this.lastCategoryUpdate) params.append('last_category_update', this.lastCategoryUpdate);
 
+                if (this.firstRun) {
+                    this.setLoading(true);
+                    this.firstRun = false;
+                }
                 const res = await fetch(`/api/bootstrap/?${params.toString()}`);
-                if (!res.ok) throw new Error('Bootstrap failed');
+                if (!res.ok) {
+                    this.setLoading(false);
+                    throw new Error('Bootstrap failed');
+                }
                 const data = await res.json();
 
                 const txStore = Alpine.store('transactions');

@@ -17,16 +17,16 @@
 		<div class="transactions-header">
 			<!-- Left: Add Transaction -->
 			<div style="display: flex; align-items: center;">
-			<button class="button is-primary is-normal" @click="$store.app.openTransactionModal()">Add Transaction
-			</button>
-
-			<template x-if="!$store.app.isMobile">
-				<button class="button is-small ml-3"
-				        @click="$store.settings.isCompactMode = !$store.settings.isCompactMode"
-				        x-text="$store.settings.isCompactMode ? 'Normal View' : 'Compact View'">
+				<button class="button is-primary is-normal" @click="$store.app.openTransactionModal()">Add Transaction
 				</button>
-			</template>
-				</div>
+
+				<template x-if="!$store.app.isMobile">
+					<button class="button is-small ml-3"
+					        @click="$store.settings.isCompactMode = !$store.settings.isCompactMode"
+					        x-text="$store.settings.isCompactMode ? 'Normal View' : 'Compact View'">
+					</button>
+				</template>
+			</div>
 			<!-- Right: Balance -->
 			<div class="balance-container" x-cloak>
 				<div class="balance-title has-text-weight-bold">
@@ -38,7 +38,6 @@
 				</div>
 			</div>
 		</div>
-		<!--		<hr style="margin-top: .6rem !important; margin-bottom: 0 !important;">-->
 		{% include "app/components/dashboard/transaction_table.html" %}
 	</div>
 </section>

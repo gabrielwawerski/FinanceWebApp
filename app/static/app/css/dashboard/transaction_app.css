@@ -37,7 +37,7 @@
 	display: grid;
 	grid-template-columns: 1fr;
 	gap: 0 !important;
-	margin-bottom: 0.5rem;
+	margin-bottom: 0.2rem;
 }
 
 /*********** CARD ***********/
@@ -171,6 +171,7 @@ transition: color 0.2s, background-color 0.2s, border 0.2s;}
 	display: flex;
 	justify-content: space-between;
 	align-items: center;
+	margin-bottom: 0.2rem;
 }
 
 .transaction-table-header {

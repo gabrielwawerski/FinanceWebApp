@@ -8,47 +8,44 @@
 
 		</div>
 
-
-		<div class="transactions-grid" x-transition>
-			<!-- No transactions message -->
-			<template x-if="paginatedTransactions.length === 0 && !$store.app.isLoading">
-				<div class="card tx-card"
+		<!-- Skeletons -->
+			<template x-if="$store.app.isLoading">
+				<div class="transactions-grid" x-transition>
+				<template x-for="i in pageSize" :key="`skeleton-${i}`">
+					<div class="card tx-card skeleton-block" style="gap:0.75rem; transition: all 0.3s ease; min-height: 40px; overflow:hidden; font-size:0.8rem;"
 				     :style="{ height: $store.settings.isCompactMode
-				     ? 'calc(var(--tx-card-height-compact) + 8px)'
-				     : 'calc(var(--tx-card-height-default) + 4px)' }"
-				     :class="$store.settings.isCompactMode ? 'mb-1' : 'mb-2'">
+				     ? 'calc(var(--tx-card-height-compact) + 8px) !important'
+				     : 'calc(var(--tx-card-height-default) + 4px) !important' }"
+				     :class="$store.settings.isCompactMode ? 'mb-1' : 'mb-2'" x-transition>
 					<div class="card-content p-4"
 					     style="display: flex; align-items: center; justify-content: center; height: 100%;">
-						No transactions.
 					</div>
+				</div>
+				</template>
 				</div>
 			</template>
 
-			<!-- Skeletons -->
-			<template x-if="$store.app.isLoading" x-effect="skeletonsVisible = $store.app.isLoading" :>
-				<template x-for="i in pageSize" :key="`skeleton-${i}`">
-					<div class="tx-card skeleton-block"
-					     :style="{ height: $store.settings.isCompactMode
-					     ? 'calc(var(--tx-card-height-compact) + 8px)'
-					     : 'calc(var(--tx-card-height-default) + 4px)' }"
-					     :class="$store.settings.isCompactMode ? 'mb-1' : 'mb-2'">
-						<div class="card-content p-4"
-						     style="display: flex; align-items: center; justify-content: center; height: 100%;">
-						</div>
-					</div>
-				</template>
+
+		<!-- Real content -->
+		<div class="transactions-grid" x-show="!$store.app.isLoading">
+			<!-- No transactions message -->
+			<template x-if="paginatedTransactions.length === 0">
+				<div class="card tx-card" style="gap:0.75rem; transition: all 0.3s ease; min-height: 40px; overflow:hidden; font-size:1.1rem;display:flex; align-items:center; justify-content:center;"
+				     :style="{ height: $store.settings.isCompactMode
+				     ? 'calc(var(--tx-card-height-compact) + 8px) !important'
+				     : 'calc(var(--tx-card-height-default) + 4px) !important' }"
+				     :class="$store.settings.isCompactMode ? 'mb-1' : 'mb-2'" x-transition>
+					No transactions found.
+				</div>
 			</template>
 
 			<!-- Transaction cards -->
 			<template x-for="t in paginatedTransactions" :key="t.id">
-				<div class="card tx-card"
-				     :class="[
-							$store.settings.isCompactMode ? 'mb-1' : 'mb-2',
-							{ 'skeleton-block': $store.app.isLoading }
-						]"
+				<div class="card tx-card" x-transition
+				     :class="$store.settings.isCompactMode ? 'mb-1' : 'mb-2'"
 				     :style="$store.settings.isCompactMode
-				     ? 'display:flex; align-items:center; justify-content:space-between; gap:0.75rem; transition: all 0.3s ease; min-height: 40px; overflow:hidden; font-size:0.8rem;'
-				     : 'transition: all 0.3s ease; max-height:200px; font-size:inherit;'"
+            ? 'display:flex; align-items:center; justify-content:space-between; gap:0.75rem; transition: all 0.3s ease; min-height: 40px; overflow:hidden; font-size:0.8rem;'
+            : ''"
 				>
 
 					<template x-if="!$store.settings.isCompactMode">
@@ -63,13 +60,13 @@
 								<div class="media-right"
 								     style="display:flex; flex-direction:column; align-items:flex-end;">
                         <span class="tag is-clickable is-unselectable"
-                              :style="`
+          :style="`
             --category-color: ${t.category?.color || '#ccc'};
             color: ${$store.app.isDarkTheme ? '#fff' : '#000'};
             border: 1px solid ${t.category?.color || '#888'};
           `"
-                              x-text="t.category?.name || 'Uncategorized'"
-                              @click="
+          x-text="t.category?.name || 'Uncategorized'"
+          @click="
             filters.category === String(t.category?.id)
               ? clearFilters()
               : filters.category = String(t.category?.id)
@@ -93,13 +90,13 @@
 							<div class="tx-card__title" x-text="t.description || 'No description'"
 							     style="flex:1 1 auto; min-width:0; overflow:hidden; text-overflow:ellipsis;"></div>
 							<span class="tag is-clickable is-unselectable"
-							      :style="`
+          :style="`
             --category-color: ${t.category?.color || '#ccc'};
             color: ${$store.app.isDarkTheme ? '#fff' : '#000'};
             border: 1px solid ${t.category?.color || '#888'};
           `"
-							      x-text="t.category?.name || 'Uncategorized'"
-							      @click="
+          x-text="t.category?.name || 'Uncategorized'"
+          @click="
             filters.category === String(t.category?.id)
               ? clearFilters()
               : filters.category = String(t.category?.id)
@@ -116,7 +113,7 @@
 
 
 			<!-- Invisible fillers (only if there are transactions and fillerCount > 0) -->
-			<template x-if="!skeletonsVisible" x-for="i in fillerCount" :key="`filler-${i}-${$store.settings.isCompactMode}`">
+			<template x-for="i in fillerCount" :key="`filler-${i}-${$store.settings.isCompactMode}`">
 				<div class="card tx-card tx-card--filler is-invisible"
 				     :class="{'is-compact': $store.settings.isCompactMode,
                   'is-default': !$store.settings.isCompactMode}"></div>
@@ -124,7 +121,7 @@
 		</div>
 
 		<div class="transactions-toolbar">
-			<template x-if="!$store.app.isMobile" x-cloak>
+			<template x-if="!$store.app.isMobile">
 				{% include "app/components/dashboard/transaction_filters.html" %}
 			</template>
 		</div>
