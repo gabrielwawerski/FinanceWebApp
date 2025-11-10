@@ -46,20 +46,48 @@
 	border: 1px solid transparent;
 	border-radius: 12px;
 	box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08), 0 8px 20px rgba(0, 0, 0, 0.05);
-transition: color 0.2s, background-color 0.2s, border 0.2s;}
+transition: color 0.2s, background-color 0.2s, border 0.2s;
+}
 
 [data-theme="dark"] .tx-card {
-    background: linear-gradient(135deg, #2a2a2a, #1f1f1f);
-    box-shadow: 0 2px 6px rgba(0,0,0,0.5), 0 8px 20px rgba(0,0,0,0.3);
+  background: linear-gradient(135deg, #2a2a2a, #1f1f1f);
+  box-shadow: 0 2px 6px rgba(0,0,0,0.5), 0 8px 20px rgba(0,0,0,0.3);
+  transition: all 0.2s ease;
 }
 
-[data-theme="dark"] .tag {
-	background-color: rgba(255,255,255,0.1);
-}
-
+/* Hover effect: Theme-aware backgrounds */
 .tx-card:hover {
-	border: 1px solid hsl(204, 86%, 53%);
-	color: hsl(204, 86%, 53%);
+  border: 1px solid hsl(204, 86%, 53%);
+  color: hsl(204, 86%, 53%);
+  background-size: 400% 400%;
+  animation: gradientShift 2s ease forwards;
+}
+
+/* Light theme hover: Subtle blue-tinted gradient on white base */
+[data-theme="light"] .tx-card:hover,
+.tx-card:hover {  /* Fallback for unspecified theme (assumes light default) */
+  background:
+		  linear-gradient(125deg,
+		  rgba(172, 217, 241, 0.25),
+		  rgba(188, 208, 215, 0.35),
+		  hsl(204, 86%, 53%, 0.2));
+}
+
+/* Dark theme hover: Blue-tinted gradient on dark base */
+[data-theme="dark"] .tx-card:hover {
+  background:
+    linear-gradient(125deg,
+    rgba(62, 77, 96, 0.4),  /* Darker desaturated blue-gray for depth */
+      rgba(52, 64, 77, 0.4),   /* Mid-tone dark gray-blue for transition */
+      hsl(204, 86%, 30%, 0.2)  /* Subtle blue accent, darkened for low-light contrast */
+    );
+}
+
+/* Gradient animation */
+@keyframes gradientShift {
+  0% { background-position: 0% 50%; }
+	50% { background-position: 50% 50%; }   /* Mid-diagonal sweep */
+  100% { background-position: 100% 50%; }
 }
 
 /* Tag default */
