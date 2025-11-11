@@ -31,12 +31,18 @@ document.addEventListener('alpine:init', () => {
             };
 
             // Add throttled resize listener
-            window.addEventListener('resize', throttle(() => this.updateIsMobile(), 500));
+            window.addEventListener('resize', throttle(() => this.updateIsMobile(), 100));
+
+            window.addEventListener('orientationchange', () => {
+	        	// Force recalculation after rotation settles
+	        	setTimeout(() => this.updateIsMobile(), 100);
+	        });
 
             let focusTimeout;
             window.addEventListener('focus', () => {
                 clearTimeout(focusTimeout);
-                focusTimeout = setTimeout(() => this.syncIfNeeded(), 1500);
+                focusTimeout = setTimeout(() => this.syncIfNeeded(), 1000);
+                this.updateIsMobile()
             });
 
             // Run bootstrap only on the homepage
@@ -46,7 +52,7 @@ document.addEventListener('alpine:init', () => {
         },
 
         updateIsMobile() {
-            this.isMobile = window.innerWidth <= 767;
+            Alpine.store('app').isMobile = window.innerWidth <= 767;
         },
 
         toggleTheme() {
@@ -66,12 +72,12 @@ document.addEventListener('alpine:init', () => {
                 if (this.lastCategoryUpdate) params.append('last_category_update', this.lastCategoryUpdate);
 
                 if (this.firstRun) {
-                    this.setLoading(autoRefresh);
+                    this.setLoading(true);
                     this.firstRun = false;
                 }
                 const res = await fetch(`/api/bootstrap/?${params.toString()}`);
                 if (!res.ok) {
-                    this.setLoading(autoRefresh);
+                    this.setLoading(true);
                     throw new Error('Bootstrap failed');
                 }
                 const data = await res.json();

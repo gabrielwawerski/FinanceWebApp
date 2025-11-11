@@ -20,6 +20,8 @@
 	--bulma-scheme-h: 210;
 	--income-color: #2ecc71;
 	--expense-color: #e74c3c;
+	--primary-color: hsl(var(--bulma-focus-h),var(--bulma-focus-s),var(--bulma-focus-l));
+	--dropdown-icon-color: #999;
 }
 
 .section {
@@ -45,12 +47,6 @@
 	justify-content: center;
 }
 
-/* Subtle hover feedback */
-.navbar-item:hover .icon {
-	transform: scale(1.1);
-	transition: transform 0.15s ease;
-}
-
 /* Adjust icon color for theme */
 [data-theme="dark"] .navbar-item .icon {
 	stroke: #fff;
@@ -58,6 +54,7 @@
 [data-theme="light"] .navbar-item .icon {
 	stroke: #222;
 }
+
 /* Buttons */
 .button.is-primary {
 	color: white;
@@ -73,18 +70,8 @@
 	color: white;
 }
 
-.navbar.is-primary .navbar-burger:hover {
-	color: hsl(var(--bulma-scheme-h), 20%, 90%);
-	background-color: transparent;
-}
-
 .navbar.is-primary .navbar-item,
 .navbar.is-primary .navbar-link {
-	color: white;
-}
-
-.navbar.is-primary .navbar-item:hover,
-.navbar.is-primary .navbar-link:hover {
 	color: white;
 }
 

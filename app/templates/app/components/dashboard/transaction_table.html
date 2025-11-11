@@ -1,155 +1,196 @@
 <section
-	x-data="transactionsList()"
-	class=""
-	:class="{ 'is-dark': $store.app.isDarkTheme }"
-	>
+	 x-data="transactionsList()"
+	 class="tx-card"
+	 :class="{ 'is-dark': $store.app.isDarkTheme }"
+>
 
 	<!-- Header: filters + controls -->
-	<header class="tx-card__header">
-		<div style="display:flex;align-items:center;gap:12px;flex:1;">
-			<!-- search -->
-			<div class="field">
-				<div class="control">
+	<!-- Header: filters + controls -->
+	<header class="tx-card__header px-3 py-2 is-flex is-align-items-center is-justify-content-space-between">
+
+		<!-- Left: search + category -->
+		<div class="is-flex is-align-items-center" style="gap: 0.75rem;">
+
+			<!-- Search -->
+			<div class="field is-expanded mb-0">
+				<div class="control has-icons-left">
 					<input
-						class="input"
-						placeholder="Search description or amount"
-						type="text"
-						x-model="q"
-						@input="goToPage(1)"
-						>
+						 class="input is-small"
+						 type="text"
+						 placeholder="Search description or amount"
+						 x-model="q"
+						 @input="goToPage(1)"
+					>
+					<span class="icon is-small is-left">
+					<i class="fas fa-search"></i>
+				</span>
 				</div>
 			</div>
 
-			<!-- category filter (simple select populated from store.categories) -->
+
+			<!--			 Category dropdown -->
 			<div class="field">
 				<div class="control">
-					<div class="select">
-						<select x-model="categoryFilter" @change="goToPage(1)">
-							<option value="">All categories</option>
-							<template x-for="c in categories" :key="c.id">
-								<option :value="c.id" x-text="c.name"></option>
-							</template>
-						</select>
+					<div class="dropdown" x-data="{ open: false }" @click.away="open = false" :class="{'is-active': open}">
+						<div class="dropdown-trigger">
+							<!-- Button styled like an input -->
+							<button
+								 class="button is-small has-icons-right"
+								 :class="{ 'is-focused': open }"
+								 aria-haspopup="true"
+								 aria-controls="category-dropdown-menu"
+								 @click="open = !open"
+								 style="justify-content: space-between; text-align: left; cursor: pointer;"
+							>
+								<span x-text="lookupCategory(categoryFilter) || 'All categories'"></span>
+								<span class="icon is-small is-right dropdown-icon"
+								:style="{ 'transform': open ? 'rotate(180deg)' : 'none' }">
+            <i class="fas fa-angle-down " aria-hidden="true"></i>
+          </span>
+							</button>
+						</div>
+
+						<div class="dropdown-menu" id="category-dropdown-menu" role="menu">
+							<div class="dropdown-content">
+								<a
+									 href="#"
+									 class="dropdown-item"
+									 :class="{ 'is-active': categoryFilter === '' }"
+									 @click.prevent="categoryFilter = ''; goToPage(1); open = false"
+								>
+									All categories
+								</a>
+								<template x-for="c in categories" :key="c.id">
+									<a
+										 href="#"
+										 class="dropdown-item"
+										 :class="{ 'is-active': c.id === categoryFilter }"
+										 @click.prevent="categoryFilter = c.id; goToPage(1); open = false"
+										 x-text="c.name"
+									></a>
+								</template>
+							</div>
+						</div>
 					</div>
 				</div>
 			</div>
+
 		</div>
 
-		<!-- controls: compact toggle, per-page, pagination -->
-		<div style="display:flex;align-items:center;gap:8px;">
-			<!-- Show compact toggle only on desktop -->
-<!--				<template x-if="!$store.app.isMobile">-->
-					<button class="button is-small"
-					        @click="$store.settings.isCompactMode = !$store.settings.isCompactMode"
-					        x-text="$store.settings.isCompactMode ? 'Normal' : 'Compact'">
-					</button>
-<!--				</template>-->
+		<!-- Right: controls + pagination -->
+		<div class="is-flex is-align-items-center" style="gap: 0.5rem;">
+			<!-- Compact toggle -->
+			<template x-if="!$store.app.isMobile">-->
+				<button class="button is-small"
+				        @click="$store.settings.isCompactMode = !$store.settings.isCompactMode"
+				        x-text="$store.settings.isCompactMode ? 'Normal' : 'Compact'">
+				</button>
+			</template>
 
-			<div class="control">
-				<div class="select">
-					<select x-model.number="rowsPerPage" @change="goToPage(1)">
-						<option :value="6">6</option>
-						<option :value="8">8</option>
-						<option :value="12">12</option>
-						<option :value="20">20</option>
-					</select>
+			<!-- Rows per page dropdown -->
+			<div class="field" x-data="{ open: false }" @click.away="open = false" style="margin-bottom: 0;">
+				<div class="control">
+					<div :class="['dropdown', open ? 'is-active' : '']">
+						<div class="dropdown-trigger">
+							<button class="button is-small" @click="open = !open" type="button">
+								<span x-text="rowsPerPage"></span>
+								<span class="icon is-small dropdown-icon" :class="{ 'is-rotated': open }">
+								<i class="fas fa-angle-down"></i>
+							</span>
+							</button>
+						</div>
+						<div class="dropdown-menu" role="menu">
+							<div class="dropdown-content">
+								<a href="#" class="dropdown-item" @click.prevent="rowsPerPage=6; goToPage(1); open=false">6</a>
+								<a href="#" class="dropdown-item" @click.prevent="rowsPerPage=8; goToPage(1); open=false">8</a>
+								<a href="#" class="dropdown-item" @click.prevent="rowsPerPage=12; goToPage(1); open=false">12</a>
+								<a href="#" class="dropdown-item" @click.prevent="rowsPerPage=20; goToPage(1); open=false">20</a>
+							</div>
+						</div>
+					</div>
 				</div>
 			</div>
 
-			<nav class="pagination" role="navigation" aria-label="pagination" style="margin-left:8px;">
+			<!-- Pagination -->
+			<nav class="pagination is-small" role="navigation" aria-label="pagination">
 				<a class="pagination-previous" :class="{ 'is-disabled': currentPage <= 1 }" @click.prevent="prevPage()">Prev</a>
 				<a class="pagination-next" :class="{ 'is-disabled': currentPage >= totalPages }" @click.prevent="nextPage()">Next</a>
-				<ul class="pagination-list" style="margin-left:8px;">
+				<ul class="pagination-list ml-2">
 					<li><a class="pagination-link is-current" x-text="currentPage"></a></li>
-					<li style="margin-left:6px;color:var(--tx-muted)">/ <span x-text="totalPages"></span></li>
+					<li class="ml-2 has-text-grey">/ <span x-text="totalPages"></span></li>
 				</ul>
 			</nav>
 		</div>
 	</header>
 
-	<!-- Body: fixed-height container; computed height set inline -->
-	<div
-		class="tx-card__body"
-		:style="`height: ${computedContainerHeight}px;`"
-	>
-		<!-- scrollable list -->
-		<div
-			class="tx-list"
-			:style="`height: ${computedListInnerHeight}px;`"
-			>
 
-			<!-- LOADING skeletons -->
-			<template x-if="$store.app.isLoading">
-				<div>
-					<template x-for="n in rowsPerPage" :key="n">
-						<div class="skeleton-row" :class="{ 'skeleton--compact': $store.settings.isCompactMode }">
-							<div style="width:100px;flex:0 0 100px;" class="skeleton skeleton__rect"></div>
-							<div style="flex:1 1 auto;">
-								<div class="skeleton skeleton__rect" style="width:50%;height:14px;margin-bottom:8px;"></div>
-								<div class="skeleton skeleton__rect" style="width:30%;height:12px;"></div>
-							</div>
-							<div style="width:120px;flex:0 0 120px;" class="skeleton skeleton__rect"></div>
-							<div style="width:64px;flex:0 0 64px;" class="skeleton skeleton__rect"></div>
+	<!-- Body: fixed-height container -->
+	<div class="tx-card__body" :style="`height: ${computedContainerHeight}px;`">
+
+		<!-- LOADING skeletons -->
+		<template x-if="$store.app.isLoading">
+			<div>
+				<template x-for="n in rowsPerPage" :key="n">
+					<div class="skeleton-row" :class="{ 'skeleton--compact': $store.settings.isCompactMode }">
+						<div style="width:100px;flex:0 0 100px;">
+							<div class="skeleton skeleton__rect" style="width:70%;height:12px;"></div>
 						</div>
-					</template>
-				</div>
-			</template>
+						<div style="flex:1 1 auto;">
+							<div class="skeleton skeleton__rect" style="width:50%;height:14px;margin-bottom:8px;"></div>
+							<div class="skeleton skeleton__rect" style="width:30%;height:12px;"></div>
+						</div>
+						<div style="width:120px;flex:0 0 120px;" class="skeleton skeleton__rect"></div>
+						<div style="width:64px;flex:0 0 64px;" class="skeleton skeleton__rect"></div>
+					</div>
+				</template>
+			</div>
+		</template>
 
-			<!-- NOT loading: actual rows -->
-			<template x-if="!$store.app.isLoading">
-				<div>
-					<!-- If no results: show placeholder (occupies same height) -->
-					<template x-if="filteredCount === 0">
-						<div class="tx-no-results">
-							<div class="card" style="width:320px;">
-								<div class="card-content">
-									<p class="title is-6" style="margin-bottom:6px">No transactions</p>
-									<p class="subtitle is-7" style="color:var(--tx-muted)">No transactions match the current filters.</p>
+		<!-- Actual rows -->
+		<template x-if="!$store.app.isLoading">
+			<div>
+				<template x-if="filteredCount === 0">
+					<div class="tx-no-results">
+						<div class="card" style="width:320px;">
+							<div class="card-content">
+								<p class="title is-6" style="margin-bottom:6px">No transactions</p>
+								<p class="subtitle is-7" style="color:var(--tx-muted)">No transactions match the current filters.</p>
+							</div>
+						</div>
+					</div>
+				</template>
+
+				<template x-for="(tx, idx) in paginated" :key="tx.id ?? idx">
+					<div>
+						<!-- Desktop -->
+						<div class="tx-row" :class="{ 'tx-row--compact': $store.settings.isCompactMode }"
+						     x-show="!$store.app.isMobile" style="display:flex;">
+							<div class="tx-row__date" x-text="formatDate(tx.date)"></div>
+							<div class="tx-row__desc" x-text="tx.description || '—'"></div>
+							<div class="tx-row__cat" x-text="lookupCategory(tx.category_id)"></div>
+							<div class="tx-row__amount" x-text="formatAmount(tx.amount, tx.is_income)"></div>
+						</div>
+
+						<!-- Mobile -->
+						<!-- Mobile -->
+						<div class="tx-mobile-card" :class="{ 'tx-mobile-card--compact': $store.settings.isCompactMode }"
+						     x-show="$store.app.isMobile" style="display:block;">
+							<div class="tx-mb-row">
+								<div class="tx-mb-left">
+									<span class="tx-mb-date" x-text="formatDate(tx.date)"></span>
+									<span class="tx-mb-desc" x-text="tx.description || '—'"></span>
+								</div>
+								<div class="tx-mb-right">
+									<span class="tx-mb-cat" x-text="lookupCategory(tx.category_id)"></span>
+									<span class="tx-mb-amount" x-text="formatAmount(tx.amount, tx.is_income)"></span>
 								</div>
 							</div>
 						</div>
-					</template>
 
-	<!-- Items -->
-	<template x-for="(tx, idx) in paginated" :key="tx.id ?? idx">
-		<div>
-			<!-- Desktop (non-mobile) layout shown with x-show -->
-			<div
-				class="tx-row"
-				:class="{ 'tx-row--compact': $store.settings.isCompactMode }"
-				x-show="!$store.app.isMobile"
-				style="display: flex;"
-				>
-				<div class="tx-row__date" x-text="formatDate(tx.date)"></div>
-				<div class="tx-row__desc" x-text="tx.description || '—'"></div>
-				<div class="tx-row__cat" x-text="lookupCategory(tx.category_id)"></div>
-				<div class="tx-row__amount" x-text="formatAmount(tx.amount, tx.is_income)"></div>
-				<div class="tx-row__actions">
-					<button class="button is-small" @click="edit(tx)">Edit</button>
-				</div>
+					</div>
+				</template>
 			</div>
+		</template>
 
-			<!-- Mobile layout shown with x-show (keeps DOM stable) -->
-			<div
-				class="tx-mobile-card"
-				:class="{ 'tx-mobile-card--compact': $store.settings.isCompactMode }"
-				x-show="$store.app.isMobile"
-				style="display: block;"
-			>
-				<div class="tx-mb-header">
-					<span class="tx-mb-date" x-text="formatDate(tx.date)"></span>
-					<span class="tx-mb-amount" x-text="formatAmount(tx.amount, tx.is_income)"></span>
-				</div>
-				<div class="tx-mb-desc" x-text="tx.description || '—'"></div>
-				<div class="tx-mb-footer">
-					<span class="tx-mb-cat" x-text="lookupCategory(tx.category_id)"></span>
-					<button class="button is-small" @click="edit(tx)">Edit</button>
-				</div>
-			</div>
-		</div>
-	</template>
-				</div>
-			</template>
-		</div>
 	</div>
 </section>

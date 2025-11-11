@@ -1,5 +1,4 @@
-/* Use tabs for indentation as preferred. */
-function transactionsList(){
+function transactionsList() {
 	return {
 		// reactive state
 		q: '',
@@ -20,6 +19,11 @@ function transactionsList(){
 			this.$watch('$store.settings.isCompactMode', () => {
 				// keep current page, container will animate height
 			});
+
+			this.$watch('$store.app.isMobile', (mobile) => {
+				if (mobile) this.$store.settings.isCompactMode = false;
+			});
+
 		},
 
 		// computed helpers pulling from your stores
@@ -86,7 +90,7 @@ function transactionsList(){
 		prevPage() {
 			this.goToPage(this.currentPage - 1);
 		},
-		edit(tx){
+		edit(tx) {
 			// delegate to your modal / store
 			Alpine.store('app').openTransactionModal();
 			// You might also want to set a selectedTransaction in a store
@@ -94,22 +98,22 @@ function transactionsList(){
 		},
 
 		// small helpers for display
-		formatDate(d) {
-			if (!d) return '';
-			try {
-				const dt = new Date(d);
-				return dt.toLocaleDateString();
-			} catch (e) {
-				return d;
-			}
+		formatDate(dateStr) {
+			const date = new Date(dateStr);
+
+			const day = date.getDate() < 10 ? '0' + date.getDate() : date.getDate();
+			const month = date.getMonth() + 1 < 10 ? '0' + (date.getMonth() + 1) : (date.getMonth() + 1);
+			const year = date.getFullYear();
+
+			return `${day}/${month}/${year}`; // or `${day}/${month}/${year}` depending on format
 		},
-		formatAmount(a, isIncome){
+		formatAmount(a, isIncome) {
 			const n = Number(a) || 0;
 			const sign = isIncome ? '+' : '-';
 			// keep simple; you can replace with Intl.NumberFormat if you want locales
 			return `${sign} ${n.toFixed(2)}`;
 		},
-		lookupCategory(id){
+		lookupCategory(id) {
 			const found = this.categories.find(c => String(c.id) === String(id));
 			return found ? found.name : '';
 		}
