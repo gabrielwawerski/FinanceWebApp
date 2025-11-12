@@ -26,6 +26,43 @@
 				</div>
 			</div>
 
+			<!-- Type dropdown -->
+			<div class="field" id="type-dropdown" style="margin-bottom: 0">
+				<div class="control">
+					<div class="dropdown" x-data="{ open: false }" @click.away="open = false" :class="{ 'is-active': open }">
+						<div class="dropdown-trigger">
+							<button
+								 class="button is-small has-icons-right"
+								 :class="{ 'is-focused': open }"
+								 aria-haspopup="true"
+								 aria-controls="type-dropdown-menu"
+								 @click="open = !open"
+							>
+								<span x-text="capitalize(typeFilter) || 'All types'"></span>
+								<span class="icon is-small is-right dropdown-icon"
+								      :style="{ transform: open ? 'rotate(180deg)' : 'none' }">
+						<i class="fas fa-angle-down" aria-hidden="true"></i>
+					</span>
+							</button>
+						</div>
+
+						<div class="dropdown-menu" id="type-dropdown-menu" role="menu">
+							<div class="dropdown-content">
+								<a href="#" class="dropdown-item is-size-7"
+								   :class="{ 'is-active': typeFilter === '' }"
+								   @click.prevent="setTypeFilter(''); goToPage(1); open = false;">All types</a>
+								<a href="#" class="dropdown-item is-size-7"
+								   :class="{ 'is-active': typeFilter === 'income' }"
+								   @click.prevent="setTypeFilter('income'); goToPage(1); open = false;">Income</a>
+								<a href="#" class="dropdown-item is-size-7"
+								   :class="{ 'is-active': typeFilter === 'expense' }"
+								   @click.prevent="setTypeFilter('expense'); goToPage(1); open = false;">Expense</a>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+
 
 			<!-- Category dropdown -->
 			<div class="field" id="category-dropdown">
@@ -54,16 +91,16 @@
 									 href="#"
 									 class="dropdown-item is-size-7"
 									 :class="{ 'is-active': categoryFilter === '' }"
-									 @click.prevent="categoryFilter = ''; goToPage(1); open = false"
+									 @click.prevent="categoryFilter = ''; goToPage(1); open = false;"
 								>
 									All categories
 								</a>
-								<template x-for="c in categories" :key="c.id">
+								<template x-for="c in visibleCategories" :key="c.id">
 									<a
 										 href="#"
 										 class="dropdown-item is-size-7"
 										 :class="{ 'is-active': c.id === categoryFilter }"
-										 @click.prevent="categoryFilter = c.id; goToPage(1); open = false"
+										 @click.prevent="categoryFilter = c.id; goToPage(1); open = false;"
 										 x-text="c.name"
 									></a>
 								</template>
@@ -194,14 +231,14 @@
                               `"
 								     x-text="tx.category?.name || 'Uncategorized'"
 								     @click="categoryFilter === tx.category?.id
-                                ? clearFilters()
+                                ? categoryFilter = ''
                                 : categoryFilter = tx.category?.id
                                ">
 								</div>
 								<div class="tx-row__amount has-text-weight-semibold">
 									<span :class="tx.is_income ? 'has-text-success' : 'has-text-danger'"
-								     x-text="formatAmount(tx.amount, tx.currency || 'PLN') + ' PLN'"></span>
-<!--									<span style="font-size: 0.9rem;"> PLN</span>-->
+									      x-text="formatAmount(tx.amount, tx.currency || 'PLN') + ' PLN'"></span>
+									<!--									<span style="font-size: 0.9rem;"> PLN</span>-->
 								</div>
 							</div>
 						</div>
@@ -224,15 +261,15 @@
                               `"
 									     x-text="tx.category?.name || 'Uncategorized'"
 									     @click="categoryFilter === tx.category?.id
-                                ? clearFilters()
+                                ? categoryFilter = ''
                                 : categoryFilter = tx.category?.id
                                ">
 									</div>
 
 									<div class="tx-mb-amount has-text-weight-semibold">
 										<span :class="tx.is_income ? 'has-text-success' : 'has-text-danger'"
-								     x-text="formatAmount(tx.amount, tx.currency || 'PLN') + ' PLN'"></span>
-<!--									<span style="font-size: 0.8rem;"> PLN</span>-->
+										      x-text="formatAmount(tx.amount, tx.currency || 'PLN') + ' PLN'"></span>
+										<!--									<span style="font-size: 0.8rem;"> PLN</span>-->
 									</div>
 								</div>
 							</div>

@@ -12,3 +12,7 @@ function safePersist(defaultValue, key) {
 		return Alpine.$persist(defaultValue).as(key);
 	}
 }
+
+function capitalize(str) {
+	return str.charAt(0).toUpperCase() + str.slice(1);
+}
