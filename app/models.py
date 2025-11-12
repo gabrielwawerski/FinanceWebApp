@@ -18,6 +18,10 @@ class Category(models.Model):
 	def __str__(self):
 		return self.name
 
+	class Meta:
+		verbose_name = "Category"
+		verbose_name_plural = "Categories"
+
 
 class Transaction(models.Model):
 	user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="transactions")
@@ -27,3 +31,7 @@ class Transaction(models.Model):
 	is_income = models.BooleanField(default=False)
 	date = models.DateTimeField(auto_now_add=True)
 	updated_at = models.DateTimeField(auto_now=True)  # <- track last update
+
+	class Meta:
+		verbose_name = "Transaction"
+		verbose_name_plural = "Transactions"
