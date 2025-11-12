@@ -1,26 +1,27 @@
 :root {
 	/* tweak these to taste */
-	--tx-row-h-default: 70px;    /* default mode row height */
-	--tx-row-h-compact: 44px;    /* compact mode row height */
-	--tx-rows-per-page: 8;       /* default rows per page (can be changed in component) */
-	--tx-header-h: 56px;         /* header (controls) height inside the card */
+	--tx-row-h-default: 70px; /* default mode row height */
+	--tx-row-h-compact: 40px; /* compact mode row height */
+	--tx-rows-per-page: 8; /* default rows per page (can be changed in component) */
+	--tx-header-h: 56px; /* header (controls) height inside the card */
 	--tx-gap: 12px;
 	--tx-card-padding: 12px;
 	--tx-card-padding-vertical: 3px;
 	--tx-card-bg: transparent;
 	--tx-card-bg-dark: transparent;
-	--tx-row-bg: #181b1c;
-	--tx-row-bg-dark: #2c2e2f;
-	--tx-border: 1px solid rgba(0,0,0,0.06);
-	--tx-muted: #6b6b6b;
-	--tx-hover-bg: rgba(0,0,0,0.03); /* hover background for rows */
-	--tx-hover-bg-dark: rgba(255,255,255,0.1); /* hover background for dark mode */
+	--tx-row-bg: #fcfeff;
+	--tx-row-bg-dark: #1e1e1e;
+	--tx-border: 1px solid rgba(0, 0, 0, 0.06);
+	--tx-muted: #8e8e8e;
+	--tx-muted-dark: #6b6b6b;
+	--tx-hover-bg: rgba(0, 0, 0, 0.03); /* hover background for rows */
+	--tx-hover-bg-dark: rgba(255, 255, 255, 0.1); /* hover background for dark mode */
 }
 
 /* Outer card that holds header + rows area */
 .tx-card {
 	border-radius: 8px;
-	box-shadow: 0 1px 2px rgba(10,10,10,0.04);
+	box-shadow: 0 1px 2px rgba(10, 10, 10, 0.04);
 	overflow: hidden;
 	background: var(--tx-card-bg);
 }
@@ -38,11 +39,51 @@
 	gap: var(--tx-gap);
 	height: var(--tx-header-h);
 	box-sizing: border-box;
-	border-bottom: 1px solid rgba(0,0,0,0.04);
+	border-bottom: 1px solid rgba(0, 0, 0, 0.04);
 }
 
+.dropdown-menu {
+	padding-top: 0rem;
+}
 
-/* Rotation for the dropdown icon */
+/*.dropdown-content {*/
+/*	padding-top: 0.5rem;*/
+/*}*/
+
+#category-dropdown .dropdown-trigger .button {
+	justify-content: space-between;
+	text-align: left;
+	cursor: pointer;
+	width: 135px;
+	min-width: 135px;
+}
+
+#category-dropdown .dropdown-content,
+#category-dropdown .dropdown-menu {
+	width: 135px;
+	min-width: 135px;
+}
+
+#pagesize-dropdown .dropdown-trigger .button {
+	justify-content: space-between;
+	text-align: left;
+	cursor: pointer;
+	/*width: 65px;*/
+	width: 65px;
+	min-width: 65px;
+}
+
+#pagesize-dropdown .dropdown-content,
+#pagesize-dropdown .dropdown-menu {
+	/*width: 35px;*/
+	width: 65px;
+	min-width: 65px;
+}
+
+.dropdown-item {
+	padding: .375rem 0.8rem;
+}
+
 .dropdown-icon {
 	color: var(--bulma-input-icon-color);
 	transition: transform 0.2s ease, color 0.2s ease; /* smooth rotation and color transition */
@@ -62,6 +103,15 @@
 	color: var(--bulma-input-icon-focus-color);
 }
 
+.display-mode-button {
+	width: 65px;
+}
+
+.pagination-list {
+	margin: 0 0.5rem;
+	width: 60px;
+}
+
 /* Container with fixed height (pagination drives visible rows) */
 .tx-card__body {
 	overflow: hidden;
@@ -70,39 +120,238 @@
 	transition: height 220ms ease;
 }
 
-/* Each row (desktop) */
+/* Each row (shared base) */
 .tx-row {
-	display: flex;
-	align-items: center;
-	gap: var(--tx-gap);
 	padding: var(--tx-card-padding-vertical) var(--tx-card-padding);
 	box-sizing: border-box;
-	border-bottom: 1px solid rgba(0,0,0,0.03);
+	/*border-bottom: 1px solid rgba(0,0,0,0.03);*/
 	min-height: var(--tx-row-h-default);
-	transition: background 0.2s ease;
-	background: var(--tx-row-bg);
+	border: 1px solid transparent;
+	border-radius: 12px;
+	box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08), 0 8px 20px rgba(0, 0, 0, 0.05);
+	transition: color 0.2s, background-color 0.2s, border 0.2s;
+	background: linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(245, 245, 245, 0.95));
+
+}
+
+[data-theme="dark"] .tx-row {
+	background: linear-gradient(135deg, #2a2a2a, #1f1f1f);
+	box-shadow: 0 2px 6px rgba(0, 0, 0, 0.5), 0 8px 20px rgba(0, 0, 0, 0.3);
+	transition: all 0.2s ease;
 }
 
 /* Row hover effect */
 .tx-row:hover {
-	background: var(--tx-hover-bg);
+	border: 1px solid hsl(204, 86%, 53%);
+	color: hsl(204, 86%, 53%) !important;
+	background-size: 400% 400%;
+	animation: gradientShift 2s ease forwards;
 }
+
 [data-theme="dark"] .tx-row:hover {
-	background: var(--tx-hover-bg-dark);
+	background: linear-gradient(125deg,
+	rgba(62, 77, 96, 0.4), /* Darker desaturated blue-gray for depth */ rgba(52, 64, 77, 0.4), /* Mid-tone dark gray-blue for transition */ hsl(204, 86%, 30%, 0.2) /* Subtle blue accent, darkened for low-light contrast */
+	);
 }
+
+
+/* Light theme hover: Subtle blue-tinted gradient on white base */
+[data-theme="light"] .tx-row:hover,
+.tx-row:hover { /* Fallback for unspecified theme (assumes light default) */
+	background: linear-gradient(125deg,
+	rgba(172, 217, 241, 0.25),
+	rgba(188, 208, 215, 0.35),
+	hsl(204, 86%, 53%, 0.2));
+}
+
+/* Gradient animation */
+@keyframes gradientShift {
+	0% {
+		background-position: 0% 50%;
+	}
+	50% {
+		background-position: 50% 50%;
+	}
+	/* Mid-diagonal sweep */
+	100% {
+		background-position: 100% 50%;
+	}
+}
+
 
 /* Adjust row height in compact mode (desktop only) */
 .tx-row--compact {
 	min-height: var(--tx-row-h-compact);
+	font-size: 0.8rem;
 }
 
-/* Row content areas */
+/* Normal desktop: 2-column stacked items (applied only when NOT compact) */
+.tx-row:not(.tx-row--compact) {
+	display: flex;
+	justify-content: space-between;
+	align-items: stretch;
+	gap: var(--tx-gap);
+	flex-wrap: nowrap;
+	margin: 0.3rem 0;
+}
+
+/* Ensure left column can shrink and allow ellipsis */
+.tx-row__left {
+	flex: 1 1 0%;
+	min-width: 0; /* important for text-overflow inside flex */
+	display: flex;
+	flex-direction: column;
+	justify-content: flex-start; /* Push date to top left */
+	padding-right: 12px;
+	font-size: 0.9rem;
+}
+
+/* Right column: fixed width (adjust to taste) */
+.tx-row__right {
+	flex: 0 0 200px; /* tweak 200px if you want wider/narrower */
+	display: flex;
+	flex-direction: column;
+	justify-content: flex-start; /* Push category to top right */
+	align-items: flex-end; /* Align items to right within column */
+	font-size: 0.9rem;
+}
+
+/* Override old width/flex rules that broke layout */
+.tx-row:not(.tx-row--compact) .tx-row__date,
+.tx-row:not(.tx-row--compact) .tx-row__cat,
+.tx-row:not(.tx-row--compact) .tx-row__amount,
+.tx-row:not(.tx-row--compact) .tx-row__desc {
+	width: auto;
+	flex: none;
+}
+
+/* Styling for top / bottom spacing inside columns */
+.tx-row:not(.tx-row--compact) .tx-row__date,
+.tx-row:not(.tx-row--compact) .tx-row__cat {
+	justify-self: flex-start;
+}
+
+.tx-row:not(.tx-row--compact) .tx-row__desc {
+	/*font-size: 0.95rem;*/
+	/*line-height: 1;*/
+	overflow: hidden;
+	text-overflow: ellipsis;
+	display: -webkit-box;
+	-webkit-box-orient: vertical;
+	-webkit-line-clamp: 2; /* limit description to 2 lines */
+	justify-self: flex-end;
+}
+
+/* Amount alignment */
+.tx-row:not(.tx-row--compact) .tx-row__amount {
+	font-weight: 600;
+	font-size: 1rem;
+}
+
+/* Restore HORIZONTAL compact layout (overrides stacked normal layout) */
+.tx-row.tx-row--compact {
+	display: flex !important;
+	flex-direction: row !important;
+	align-items: center;
+	justify-content: flex-start;
+	gap: var(--tx-gap);
+	min-height: var(--tx-row-h-compact);
+	padding: var(--tx-card-padding-vertical) var(--tx-card-padding);
+}
+
+/* Inside compact mode we convert the left/right wrappers back into row pieces */
+.tx-row--compact .tx-row__left,
+.tx-row--compact .tx-row__right {
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	justify-content: flex-start;
+	gap: var(--tx-gap);
+	padding: 0;
+}
+
+/* Left column pieces in compact mode: date + desc inline */
+.tx-row--compact .tx-row__date {
+	flex: 0 0 110px; /* fixed date column */
+	width: 110px;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	color: var(--tx-muted);
+	font-size: 0.9rem;
+	margin: 0;
+}
+
+[data-theme="dark"] .tx-row--compact .tx-row__date {
+	color: var(--tx-muted-dark);
+}
+
+.tx-row--compact .tx-row__desc {
+	flex: 1 1 auto; /* takes remaining space */
+	font-size: 0.9rem;
+	min-width: 0; /* allows ellipsis to work inside flex */
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	margin: 0;
+}
+
+/* Right column pieces in compact mode: category + amount aligned right */
+.tx-row--compact .tx-row__right {
+	flex: 0 0 260px; /* total width reserved for cat+amount (tune as needed) */
+	justify-content: flex-end;
+	align-items: center;
+}
+
+/* Category (left of the right block) */
+.tx-row--compact .tx-row__cat {
+	/*flex: 0 0 140px;*/
+	/*width: 70px !important;*/
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	color: var(--tx-muted);
+	text-align: left; /* keep category left-aligned inside its slot */
+	margin: 0;
+}
+
+/* Amount (right-most) */
+.tx-row--compact .tx-row__amount {
+	flex: 0 0 120px;
+	width: 120px;
+	text-align: right;
+	font-weight: 600;
+	font-size: 0.95rem;
+	margin: 0;
+}
+
+/* If the DOM still has direct children (defensive) */
+.tx-row--compact > .tx-row__date,
+.tx-row--compact > .tx-row__desc,
+.tx-row--compact > .tx-row__cat,
+.tx-row--compact > .tx-row__amount {
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+
+/* Keep hover behavior for compact rows */
+.tx-row--compact:hover {
+	background: var(--tx-hover-bg);
+}
+
+[data-theme="dark"] .tx-row--compact:hover {
+	background: var(--tx-hover-bg-dark);
+}
+
+/* Row content areas (shared, with overrides above) */
 .tx-row__date {
 	width: 110px;
 	flex: 0 0 110px;
 	font-size: 0.9rem;
 	color: var(--tx-muted);
 }
+
 .tx-row__desc {
 	flex: 1 1 auto;
 	overflow: hidden;
@@ -111,22 +360,25 @@
 	-webkit-box-orient: vertical;
 	-webkit-line-clamp: 2;
 	white-space: normal;
-	line-height: 1.3;
+	line-height: 1.1;
 	max-height: calc(1.3em * 2);
 }
+
 .tx-row__cat {
-	width: 140px;
+	/*width: 140px;*/
 	flex: 0 0 140px;
 	text-align: left;
 	font-size: 0.9rem;
 	color: var(--tx-muted);
 }
+
 .tx-row__amount {
 	width: 120px;
 	flex: 0 0 120px;
 	text-align: right;
 	font-weight: 600;
 }
+
 .tx-row__actions {
 	width: 64px;
 	flex: 0 0 64px;
@@ -144,21 +396,37 @@
 	box-sizing: border-box;
 }
 
-/* Dark mode skeleton (keep your original) */
-[data-theme="dark"] .skeleton {
+/* Tag styling */
+.tag {
+	padding: 0.25rem 0.55rem;
+	font-size: 0.75rem;
+	font-weight: 500;
 	border-radius: 6px;
-	background: linear-gradient(
-		90deg,
-		rgba(120, 120, 120, 0.2) 25%,
-		rgba(90, 90, 90, 0.35) 50%,
-		rgba(120, 120, 120, 0.2) 75%
-	);
-	background-size: 200% 100%;
-	animation: shimmer 1.1s linear infinite;
-	opacity: 0.9;
+	transition: all 0.2s ease;
+	border: 1px solid currentColor;
+	flex: 0 0 auto;
+	text-overflow: ellipsis;
 }
 
-/* Light mode skeleton: invert dark gradient */
+/* Tag default */
+.tag.is-clickable {
+	background-color: transparent;
+	transition: background-color 0.2s;
+	cursor: pointer;
+}
+
+/* When the card is hovered, update the tag's background using CSS variable */
+.tx-row:hover .tag.is-clickable {
+	background-color: var(--category-color);
+}
+
+/* Optional: remove transition and background instantly on click */
+.tag.is-clickable:active {
+	background-color: transparent;
+	transition: none;
+}
+
+/* Skeleton loading (light mode) */
 .skeleton {
 	border-radius: 6px;
 	background: linear-gradient(
@@ -172,34 +440,65 @@
 	opacity: 1;
 	transition: all 0.2s ease;
 }
+
 @keyframes shimmer {
-	0% { background-position: 200% 0 }
-	100% { background-position: -200% 0 }
+	0% {
+		background-position: 200% 0
+	}
+	100% {
+		background-position: -200% 0
+	}
 }
+
 .skeleton-row {
 	display: flex;
 	gap: var(--tx-gap);
 	align-items: center;
 	padding: var(--tx-card-padding-vertical) var(--tx-card-padding);
 	box-sizing: border-box;
-	border-bottom: 1px solid rgba(0,0,0,0.03);
+	border-bottom: 1px solid rgba(0, 0, 0, 0.03);
 	min-height: var(--tx-row-h-default);
 	transition: all 0.2s ease;
 }
+
 .skeleton--compact {
 	min-height: var(--tx-row-h-compact);
 }
+
 .skeleton__rect {
 	height: 14px;
 	width: 100%;
 	border-radius: 6px;
 }
 
+/* Dark mode skeleton */
+[data-theme="dark"] .skeleton {
+	border-radius: 6px;
+	background: linear-gradient(
+		90deg,
+		rgba(120, 120, 120, 0.2) 25%,
+		rgba(90, 90, 90, 0.35) 50%,
+		rgba(120, 120, 120, 0.2) 75%
+	);
+	background-size: 200% 100%;
+	animation: shimmer 1.1s linear infinite;
+	opacity: 0.9;
+}
+
 /* Small responsive tweaks (desktop vs mobile) */
 @media (max-width: 768px) {
-	.tx-row__date { display: none; }
-	.tx-row__cat { display: none; }
-	.tx-row__amount { width: 100px; flex: 0 0 100px; }
+	.tx-row__date {
+		display: none;
+	}
+
+	.tx-row__cat {
+		display: none;
+	}
+
+	.tx-row__amount {
+		width: 100px;
+		flex: 0 0 100px;
+	}
 
 	.tx-card__header {
 		flex-direction: column;
@@ -207,6 +506,7 @@
 		height: auto;
 		gap: calc(var(--tx-gap) - 4);
 	}
+
 	.tx-card__body {
 		border-top: none;
 	}
@@ -222,9 +522,13 @@
 	border: 1px solid var(--tx-border);
 	border-radius: 8px;
 	margin-bottom: 8px;
-	background: var(--tx-bg);
-	box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+	box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
 	padding: var(--tx-card-padding) 0;
+}
+
+.tx-mobile-card--compact {
+	min-height: var(--tx-row-h-compact);
+	font-size: 0.9rem;
 }
 
 /* Mobile card layout: left = date/desc, right = category/amount */
@@ -235,25 +539,31 @@
 	gap: var(--tx-gap);
 	width: 100%;
 }
+
 .tx-mb-left {
 	flex: 1 1 auto; /* take remaining space */
 }
+
 .tx-mb-right {
 	flex: 0 0 auto; /* width determined by content (category/amount) */
 	text-align: right;
 }
+
 .tx-mb-left, .tx-mb-right {
 	display: flex;
 	flex-direction: column;
 	min-width: 0; /* important for text-overflow to work inside flex */
 }
+
 .tx-mb-date, .tx-mb-cat {
 	font-weight: 500;
 }
+
 .tx-mb-amount {
 	font-weight: 600;
 	text-align: right;
 }
+
 .tx-mb-desc {
 	color: var(--tx-muted);
 	font-size: 0.9rem;

@@ -26,6 +26,13 @@ function transactionsList() {
 
 		},
 
+		clearFilters() {
+            this.q = '';
+            // this.filters.type = '';
+            this.categoryFilter = '';
+            this.currentPage = 1;
+        },
+
 		// computed helpers pulling from your stores
 		get transactions() {
 			return Alpine.store('transactions').transactions || [];
@@ -63,8 +70,8 @@ function transactionsList() {
 		// heights for container calculation (stay in sync with CSS variables)
 		get rowHeight() {
 			return this.$store.settings.isCompactMode
-				? Number(getComputedStyle(document.documentElement).getPropertyValue('--tx-row-h-compact')) || 44
-				: Number(getComputedStyle(document.documentElement).getPropertyValue('--tx-row-h-default')) || 70;
+				? Number(getComputedStyle(document.documentElement).getPropertyValue('--tx-row-h-compact')) || 40
+				: Number(getComputedStyle(document.documentElement).getPropertyValue('--tx-row-h-default')) || 80;
 		},
 		get headerHeight() {
 			return Number(getComputedStyle(document.documentElement).getPropertyValue('--tx-header-h')) || 56;
@@ -107,12 +114,14 @@ function transactionsList() {
 
 			return `${day}/${month}/${year}`; // or `${day}/${month}/${year}` depending on format
 		},
-		formatAmount(a, isIncome) {
-			const n = Number(a) || 0;
-			const sign = isIncome ? '+' : '-';
-			// keep simple; you can replace with Intl.NumberFormat if you want locales
-			return `${sign} ${n.toFixed(2)}`;
-		},
+formatAmount(a, isIncome) {
+	const n = Number(a) || 0;
+	// Round to 2 decimals first
+	const rounded = Math.round(n * 100) / 100;
+	// If it's a whole number, return integer; otherwise return 2 decimals
+	return Number.isInteger(rounded) ? `${rounded}` : rounded.toFixed(2);
+},
+
 		lookupCategory(id) {
 			const found = this.categories.find(c => String(c.id) === String(id));
 			return found ? found.name : '';
