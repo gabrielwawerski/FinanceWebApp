@@ -3,7 +3,7 @@ function transactionsList() {
 		q: '',
 		typeFilter: '',
 		categoryFilter: '',
-		rowsPerPage: parseInt(getComputedStyle(document.documentElement).getPropertyValue('--tx-rows-per-page')) || 8,
+		rowsPerPage: safePersist(parseInt(getComputedStyle(document.documentElement).getPropertyValue('--tx-rows-per-page')) || 8, 'rowsPerPage'),
 		currentPage: 1,
 
 		init() {
@@ -33,6 +33,7 @@ function transactionsList() {
 			this.typeFilter = '';
 			this.categoryFilter = '';
 			this.currentPage = 1;
+			this.goToPage(1);
 		},
 
 		get transactions() {

@@ -16,6 +16,10 @@
 	--tx-muted-dark: #6b6b6b;
 	--tx-hover-bg: rgba(0, 0, 0, 0.03); /* hover background for rows */
 	--tx-hover-bg-dark: rgba(255, 255, 255, 0.1); /* hover background for dark mode */
+	/*width: 100vw;*/
+	/*height: 100vh;*/
+	user-select: none;
+	cursor: default;
 }
 
 /* Outer card that holds header + rows area */
@@ -123,9 +127,48 @@
 	width: 60px;
 }
 
+/* Container that needs a scrollbar */
+.tx-card__body {
+	overflow: auto;
+
+	/* Firefox: thin overlay scrollbar */
+	scrollbar-width: thin;              /* thin | auto | none */
+	scrollbar-color: rgba(0,0,0,0.3) transparent; /* thumb | track */
+}
+
+/* WebKit browsers: Chrome, Edge, Safari */
+.tx-card__body::-webkit-scrollbar {
+	width: 8px;
+	height: 8px;
+}
+
+.tx-card__body::-webkit-scrollbar-track {
+	background: transparent;
+}
+
+.tx-card__body::-webkit-scrollbar-thumb {
+	background-color: rgba(0, 0, 0, 0.3);
+	border-radius: 4px;
+	border: 2px solid transparent;   /* space around thumb */
+	background-clip: content-box;   /* ensures border spacing */
+	transition: background-color 0.2s ease;
+}
+
+.tx-card__body::-webkit-scrollbar-thumb:hover {
+	background-color: rgba(0, 0, 0, 0.5);
+}
+
+/* Optional: prevent layout shift in Chrome-based browsers */
+.tx-card__body {
+	overflow: overlay; /* Scrollbar floats over content */
+}
+
+
 /* Container with fixed height (pagination drives visible rows) */
 .tx-card__body {
-	overflow: hidden;
+	overflow: auto;
+	min-height: 145px;
+	max-height: 72vh; /* best browser: 82vh */
 	padding: 0;
 	position: relative;
 	transition: height 220ms ease;
@@ -163,6 +206,7 @@
 	background: linear-gradient(125deg,
 	rgba(62, 77, 96, 0.4), /* Darker desaturated blue-gray for depth */ rgba(52, 64, 77, 0.4), /* Mid-tone dark gray-blue for transition */ hsl(204, 86%, 30%, 0.2) /* Subtle blue accent, darkened for low-light contrast */
 	);
+	background-color: #1e1e1e;
 }
 
 

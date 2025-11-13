@@ -10,6 +10,18 @@
 		<!-- Left: search + category -->
 		<div class="is-flex is-align-items-center" style="gap: 0.75rem;flex-grow: 1;">
 
+			<div class="control">
+	<button
+		class="button is-small is-light"
+		:disabled="!q && !typeFilter && !categoryFilter"
+		@click="clearFilters()"
+		title="Clear search and all filters"
+	>
+		<span class="icon is-small"><i class="fas fa-undo"></i></span>
+		<span>Reset</span>
+	</button>
+</div>
+
 			<!-- Search -->
 			<div class="field is-expanded mb-0">
 				<div class="control has-icons-left">
@@ -174,7 +186,7 @@
 
 
 	<!-- Body: fixed-height container -->
-	<div class="tx-card__body" :style="`height: ${computedContainerHeight}px;`">
+	<div class="tx-card__body"> <!-- :style="`height: ${computedContainerHeight}px;`" -->
 
 		<!-- LOADING skeletons -->
 		<template x-if="$store.app.isLoading">
@@ -231,7 +243,7 @@
                               `"
 								     x-text="tx.category?.name || 'Uncategorized'"
 								     @click="categoryFilter === tx.category?.id
-                                ? categoryFilter = ''
+                                ? clearFilters()
                                 : categoryFilter = tx.category?.id
                                ">
 								</div>
@@ -261,7 +273,7 @@
                               `"
 									     x-text="tx.category?.name || 'Uncategorized'"
 									     @click="categoryFilter === tx.category?.id
-                                ? categoryFilter = ''
+                                ? clearFilters()
                                 : categoryFilter = tx.category?.id
                                ">
 									</div>
